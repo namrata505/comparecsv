@@ -13,10 +13,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "CompareCSV - Compare CSV & Excel Files Online",
+  title: "Compare CSV & Excel Files Online | Free VLOOKUP Tool",
 
   description:
-    "Free online tool to compare CSV and Excel files, detect duplicates, find missing rows, and export results instantly.",
+    "CompareCSV is a free online tool to compare CSV and Excel files, find duplicates, missing rows, and export results instantly.",
 
   keywords: [
     "CSV compare",
