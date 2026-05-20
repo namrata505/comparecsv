@@ -62,22 +62,22 @@ export default function Home() {
         </div>
 
       </section>
+
+
       <section className="max-w-5xl mx-auto px-6 py-16 text-gray-700">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+        <h2 className="text-3xl font-bold text-white mb-4">
           What is CompareCSV?
         </h2>
 
-        <p className="mb-4">
-          CompareCSV is a free online tool that allows users to compare CSV and Excel (XLSX) files instantly.
-          It helps detect differences, missing rows, duplicates, and mismatched data without installing any software.
+        <p className="mb-4 text-slate-300">
+          CompareCSV is a free online tool that allows users to compare CSV and Excel (XLSX) files instantly. It helps detect differences, missing rows, duplicates, and mismatched data without installing any software.
         </p>
 
-        <p className="mb-4">
-          The tool is widely used in data analysis, HR management, finance reconciliation, inventory tracking,
-          and database validation tasks.
+        <p className="mb-4 text-slate-400">
+          The tool is widely used in data analysis, HR management, finance reconciliation, inventory tracking, and database validation tasks.
         </p>
 
-        <p>
+        <p className="text-slate-300">
           Simply upload two files, compare them, and download the results in CSV format.
         </p>
       </section>
@@ -112,7 +112,7 @@ export default function Home() {
 
       </section>
 
-      {/* Trust section */}
+      {/* Trust */}
       <section className="max-w-6xl mx-auto px-6 py-10 grid md:grid-cols-3 gap-6 text-center">
           <div>
             <h3 className="font-semibold">Free to Use</h3>
