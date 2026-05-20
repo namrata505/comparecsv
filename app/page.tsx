@@ -122,6 +122,218 @@ export default function Home() {
 
       </footer>
 
+    {/* SEO Content Section */}
+
+      <section className="max-w-7xl mx-auto px-6 py-24">
+
+        <div className="max-w-5xl">
+
+          <h2 className="text-4xl md:text-5xl font-bold mb-8">
+            Compare CSV & Excel Files Online Instantly
+          </h2>
+
+          <div className="space-y-6 text-slate-300 leading-8 text-lg">
+
+            <p>
+              CompareCSV is a free online CSV and Excel comparison tool
+              that helps users compare spreadsheets quickly and accurately.
+            </p>
+
+            <p>
+              Upload CSV or XLSX files to detect duplicate rows,
+              identify missing data, compare records like VLOOKUP,
+              and export comparison results instantly.
+            </p>
+
+            <p>
+              The tool works directly in your browser and supports
+              fast spreadsheet comparison without requiring software installation.
+            </p>
+
+            <p>
+              CompareCSV is useful for data analysts, HR teams,
+              accountants, developers, researchers, and businesses
+              working with spreadsheet datasets.
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* Features Section */}
+
+      <section className="max-w-7xl mx-auto px-6 pb-24">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+            <h3 className="text-2xl font-semibold mb-4">
+              CSV Comparison
+            </h3>
+
+            <p className="text-slate-400 leading-7">
+              Compare two CSV files online and detect matched,
+              missing, or changed records instantly.
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+            <h3 className="text-2xl font-semibold mb-4">
+              Excel File Support
+            </h3>
+
+            <p className="text-slate-400 leading-7">
+              Upload Excel XLSX spreadsheets and compare rows
+              without needing Microsoft Excel.
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+            <h3 className="text-2xl font-semibold mb-4">
+              Duplicate Detection
+            </h3>
+
+            <p className="text-slate-400 leading-7">
+              Automatically detect duplicate entries,
+              repeated IDs, and matching rows.
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+            <h3 className="text-2xl font-semibold mb-4">
+              Missing Row Finder
+            </h3>
+
+            <p className="text-slate-400 leading-7">
+              Identify rows missing between spreadsheets
+              for audits and reconciliation.
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+            <h3 className="text-2xl font-semibold mb-4">
+              Export Results
+            </h3>
+
+            <p className="text-slate-400 leading-7">
+              Download comparison results in CSV format
+              for reporting and analysis.
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+            <h3 className="text-2xl font-semibold mb-4">
+              Fast & Secure
+            </h3>
+
+            <p className="text-slate-400 leading-7">
+              Files are processed quickly with a modern,
+              privacy-focused interface.
+            </p>
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* FAQ Section */}
+
+      <section className="max-w-7xl mx-auto px-6 pb-24">
+         <div className="max-w-5xl">
+
+          <h2 className="text-4xl md:text-5xl font-bold mb-12">
+            Frequently Asked Questions
+          </h2>
+
+          <div className="space-y-6">
+
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+              <h3 className="text-2xl font-semibold mb-4">
+                How do I compare two CSV files online?
+              </h3>
+
+              <p className="text-slate-400 leading-7">
+                Upload two CSV files into CompareCSV.
+                The tool automatically compares rows,
+                detects missing entries, duplicates,
+                and generates downloadable results.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+              <h3 className="text-2xl font-semibold mb-4">
+                Can I compare Excel files online?
+              </h3>
+
+              <p className="text-slate-400 leading-7">
+                Yes. CompareCSV supports both CSV and XLSX Excel files.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+              <h3 className="text-2xl font-semibold mb-4">
+                Is CompareCSV free?
+              </h3>
+
+              <p className="text-slate-400 leading-7">
+                Yes. CompareCSV currently provides free spreadsheet
+                comparison features online.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+              <h3 className="text-2xl font-semibold mb-4">
+                Does CompareCSV store uploaded files?
+              </h3>
+
+              <p className="text-slate-400 leading-7">
+                Uploaded files are processed temporarily for comparison purposes.
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+              <h3 className="text-2xl font-semibold mb-4">
+                Can I download comparison results?
+              </h3>
+
+              <p className="text-slate-400 leading-7">
+                Yes. Comparison results can be exported and downloaded as CSV files.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* CTA Section */}
+
+      <section className="max-w-7xl mx-auto px-6 pb-32">
+
+        <div className="rounded-3xl border border-cyan-400/20 bg-cyan-500/10 p-12 text-center">
+
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            Start Comparing CSV Files Now
+          </h2>
+
+          <p className="text-slate-300 text-lg max-w-3xl mx-auto leading-8 mb-8">
+            Compare spreadsheets, detect duplicates,
+            identify missing rows, and export results instantly.
+          </p>
+
+          <a
+            href="#top"
+            className="inline-flex items-center justify-center rounded-2xl bg-cyan-400 px-8 py-4 text-black font-semibold hover:scale-105 transition"
+          >
+            Compare Files
+          </a>
+
+        </div>
+
+      </section>
+
     </main>
   );
 }
