@@ -98,6 +98,30 @@ export default function Home() {
         © 2026 CompareCSV. All rights reserved.
       </footer>
 
+      <footer className="border-t border-white/10 mt-20 py-10">
+
+        <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-6 text-slate-400">
+
+          <a href="/privacy-policy" className="hover:text-cyan-400">
+            Privacy Policy
+          </a>
+
+          <a href="/terms" className="hover:text-cyan-400">
+            Terms
+          </a>
+
+          <a href="/about" className="hover:text-cyan-400">
+            About
+          </a>
+
+          <a href="/contact" className="hover:text-cyan-400">
+            Contact
+          </a>
+
+        </div>
+
+      </footer>
+
     </main>
   );
 }
