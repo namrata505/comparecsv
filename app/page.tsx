@@ -1,5 +1,4 @@
 import FileUpload from "@/components/FileUpload";
-
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
@@ -8,11 +7,12 @@ export default function Home() {
       <header className="border-b border-white/10 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
           <h1 className="text-2xl font-bold tracking-tight">
-            Compare CSV & Excel Files Online Instantly
+            CompareCSV
           </h1>
-          <h2>
-            Free online tool to compare CSV, Excel (XLSX) files, find duplicates, missing rows, and export results instantly
-          </h2>
+
+          <h1 style={{ color: "red", fontSize: "40px" }}>
+            DEPLOY TEST 999
+          </h1>
 
           <button className="bg-cyan-500 hover:bg-cyan-400 transition px-5 py-2 rounded-xl font-medium">
             Compare Files
@@ -126,13 +126,6 @@ export default function Home() {
 
       </footer>
 
-      <div>
-        <a href="/privacy-policy">Privacy Policy</a> |
-        <a href="/terms">Terms</a> |
-        <a href="/about">About</a> |
-        <a href="/contact">Contact</a>
-      </div>
-
     {/* SEO Content Section */}
 
       <section className="max-w-7xl mx-auto px-6 py-24">
@@ -146,9 +139,8 @@ export default function Home() {
           <div className="space-y-6 text-slate-300 leading-8 text-lg">
 
             <p>
-              CompareCSV is a free online CSV comparison tool that helps you compare two CSV
-               or Excel files, detect differences, find duplicate rows, and identify 
-               missing records. It works like an online VLOOKUP tool for spreadsheets.
+              CompareCSV is a free online CSV and Excel comparison tool
+              that helps users compare spreadsheets quickly and accurately.
             </p>
 
             <p>
@@ -344,20 +336,6 @@ export default function Home() {
 
         </div>
 
-      </section>
-
-      <section>
-        <h2>Online CSV and Excel Comparison Tool</h2>
-
-        <p>
-          CompareCSV helps users compare spreadsheets online without installing Excel or any software.
-          Upload CSV or XLSX files and instantly see differences, matched rows, and missing data.
-        </p>
-
-        <p>
-          This tool is widely used for data analysis, HR records, finance reconciliation,
-          inventory comparison, and database validation.
-        </p>
       </section>
 
     </main>
