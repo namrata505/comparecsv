@@ -11,6 +11,8 @@ import {
   AlertTriangle,
   Database,
 } from "lucide-react";
+import ChartsPanel from "@/components/ChartsPanel";
+
 
 
 export default function AnalyzePage() {
@@ -347,6 +349,44 @@ export default function AnalyzePage() {
               </table>
 
             </section>
+            
+            <ChartsPanel rows={rows} headers={headers} />
+
+            <div className="rounded-2xl border border-cyan-400/20 bg-cyan-500/10 p-6 text-slate-300 leading-8 mt-8">
+
+                <h3 className="text-2xl font-semibold text-white mb-4">
+                    AI Findings
+                </h3>
+
+                <p className="mb-4">
+                    The uploaded dataset appears suitable for business intelligence,
+                    reporting, and content analysis workflows.
+                </p>
+
+                <p className="mb-4">
+                    Numeric columns can be used for trend analysis,
+                    forecasting, and chart generation.
+                </p>
+
+                <p>
+                    CompareCSV automatically transforms spreadsheet data
+                    into readable insights for blogs, videos, reports,
+                    and presentations.
+                </p>
+
+            </div>
+
+            <div className="mt-10 flex flex-wrap gap-4">
+
+                <button className="rounded-2xl bg-cyan-500 hover:bg-cyan-400 transition px-6 py-3 font-semibold text-black">
+                    Export Report
+                </button>
+
+                <button className="rounded-2xl border border-white/10 bg-white/5 hover:border-cyan-400/40 transition px-6 py-3 font-semibold">
+                    Download Charts
+                </button>
+
+            </div>
 
           </>
         )}
