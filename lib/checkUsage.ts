@@ -3,20 +3,35 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 export async function checkAIUsage(clerkUserId: string) {
   const today = new Date().toISOString().split("T")[0];
 
-  const { data, error } = await supabaseAdmin
+  let { data } = await supabaseAdmin
     .from("user_subscriptions")
     .select("*")
     .eq("clerk_user_id", clerkUserId)
     .single();
 
-  if (error || !data) {
+  if (!data) {
+    const { data: newUser } = await supabaseAdmin
+      .from("user_subscriptions")
+      .insert({
+        clerk_user_id: clerkUserId,
+        plan: "free",
+        status: "free",
+        ai_requests_today: 0,
+        usage_date: today,
+      })
+      .select()
+      .single();
+
+    data = newUser;
+  }
+
+  if (!data) {
     return {
       allowed: false,
-      reason: "User not found",
+      reason: "User could not be created",
     };
   }
 
-  // Reset usage daily
   if (data.usage_date !== today) {
     await supabaseAdmin
       .from("user_subscriptions")
@@ -29,7 +44,6 @@ export async function checkAIUsage(clerkUserId: string) {
     data.ai_requests_today = 0;
   }
 
-  // Pro users unlimited
   if (data.plan === "pro") {
     return {
       allowed: true,
@@ -38,7 +52,6 @@ export async function checkAIUsage(clerkUserId: string) {
     };
   }
 
-  // Free limit
   const FREE_LIMIT = 5;
 
   if (data.ai_requests_today >= FREE_LIMIT) {
