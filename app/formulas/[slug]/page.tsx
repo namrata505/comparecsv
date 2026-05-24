@@ -1,4 +1,4 @@
-import { Copy } from "lucide-react";
+
 import { formulas } from "@/lib/formulas";
 import { notFound } from "next/navigation";
 
@@ -46,15 +46,9 @@ export default async function FormulaPage({ params }: Props) {
               Syntax
             </h2>
 
-            <button
-              onClick={() =>
-                navigator.clipboard.writeText(formula.syntax)
-              }
-              className="flex items-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-black px-4 py-2 rounded-xl font-medium"
-            >
-              <Copy size={18} />
-              Copy
-            </button>
+            <div className="text-sm text-slate-400">
+              Copy formula manually
+            </div>
 
           </div>
 
