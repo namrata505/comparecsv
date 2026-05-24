@@ -123,6 +123,101 @@ export default function HomePage() {
       </section>
 
 
+      {/* AI Content Generatorion Section */}
+      <section className="max-w-7xl mx-auto px-6 py-20">
+
+        <div className="rounded-[32px] border border-white/10 bg-white/5 p-12 text-center">
+
+          <div className="inline-flex items-center rounded-full bg-cyan-500/10 border border-cyan-400/20 px-4 py-2 text-cyan-300 text-sm mb-8">
+            AI Spreadsheet Intelligence
+          </div>
+
+          <h2 className="text-5xl font-bold leading-tight mb-8">
+            Turn Spreadsheet Data Into
+            <span className="block text-cyan-400">
+              Charts, Reports & Content
+            </span>
+          </h2>
+
+          <p className="text-slate-300 text-lg max-w-3xl mx-auto leading-8 mb-10">
+            Upload CSV or Excel files and automatically generate
+            visual insights, business reports, blog content,
+            creator summaries, and analytics dashboards.
+          </p>
+
+          <a
+            href="/analyze"
+            className="inline-flex items-center justify-center rounded-2xl bg-cyan-500 hover:bg-cyan-400 transition px-8 py-4 text-black font-semibold"
+          >
+            Open AI Analyzer
+          </a>
+
+        </div>
+
+      </section>
+
+
+      {/* Ask AI */}
+<section className="max-w-7xl mx-auto px-6 py-24">
+
+  <div className="grid lg:grid-cols-2 gap-12 items-center">
+
+    <div>
+      <h2 className="text-5xl font-bold leading-tight mb-8"> 
+        
+        <div className="inline-flex items-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-cyan-300 text-sm mb-8">
+            AI Spreadsheet Assistant
+          </div>
+
+            Ask AI Questions
+        <span className="block text-cyan-400">
+          About Your Spreadsheet
+        </span>        
+      </h2>    
+
+      <p className="text-slate-300 text-lg leading-8 mb-10">
+        Upload CSV or Excel files and instantly generate
+        AI-powered insights, reports, blog posts,
+        YouTube scripts, business summaries,
+        and chart explanations.
+      </p>
+
+      <a
+        href="/analyze"
+        className="inline-flex items-center justify-center rounded-2xl bg-cyan-500 hover:bg-cyan-400 transition px-8 py-4 text-black font-semibold"
+      >
+        Try AI Analyzer
+      </a>
+
+      </div>
+
+      <div className="rounded-[32px] border border-white/10 bg-white/5 p-10 space-y-5">
+
+        <div className="rounded-2xl bg-black/30 p-5 text-slate-300">
+          “Generate a business report from this sales dataset”
+        </div>
+
+        <div className="rounded-2xl bg-black/30 p-5 text-slate-300">
+          “Create YouTube talking points from this spreadsheet”
+        </div>
+
+        <div className="rounded-2xl bg-black/30 p-5 text-slate-300">
+          “Find hidden trends in this CSV file”
+        </div>
+
+        <div className="rounded-2xl bg-cyan-500/10 border border-cyan-400/20 p-5 text-cyan-300">
+          AI analysis generated successfully.
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+ 
+
+
+
       {/* Features */}
       <section className="max-w-7xl mx-auto px-6 pb-24">
 
