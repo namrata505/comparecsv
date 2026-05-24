@@ -2,41 +2,80 @@ export const formulas = [
   {
     slug: "vlookup",
     title: "Excel VLOOKUP Formula",
+    category: "Lookup & Reference",
     description:
       "Learn how to use VLOOKUP in Excel with syntax, examples, and explanations.",
     syntax:
       "=VLOOKUP(lookup_value, table_array, col_index_num, [range_lookup])",
     example:
-      '=VLOOKUP(A2, D2:F20, 2, FALSE)',
+      "=VLOOKUP(A2, D2:F20, 2, FALSE)",
     content:
       "VLOOKUP searches for a value in the first column of a table and returns matching data from another column.",
+
+    examples: [
+      {
+        input: "Apple",
+        formula: "=VLOOKUP(A2,D2:F20,2,FALSE)",
+        output: "$120",
+      },
+      {
+        input: "Orange",
+        formula: "=VLOOKUP(A3,D2:F20,2,FALSE)",
+        output: "$90",
+      },
+    ],
+
+    related: ["xlookup", "if", "sumifs"],
   },
 
   {
     slug: "xlookup",
     title: "Excel XLOOKUP Formula",
+    category: "Lookup & Reference",
     description:
       "Learn how to use XLOOKUP formula in Excel.",
     syntax:
       "=XLOOKUP(lookup_value, lookup_array, return_array)",
     example:
-      '=XLOOKUP(A2, D2:D20, E2:E20)',
+      "=XLOOKUP(A2,D2:D20,E2:E20)",
     content:
       "XLOOKUP is the modern replacement for VLOOKUP and HLOOKUP.",
+
+    examples: [
+      {
+        input: "101",
+        formula: "=XLOOKUP(A2,D:D,E:E)",
+        output: "John",
+      },
+    ],
+
+    related: ["vlookup", "if"],
   },
 
   {
     slug: "if",
     title: "Excel IF Formula",
+    category: "Logical",
     description:
       "Learn IF formula in Excel with examples.",
     syntax:
-      '=IF(logical_test, value_if_true, value_if_false)',
+      "=IF(logical_test, value_if_true, value_if_false)",
     example:
-      '=IF(A2>50000,"Bonus","No Bonus")',
+      "=IF(A2>50000,'Bonus','No Bonus')",
     content:
       "IF formula performs logical comparisons in Excel.",
+
+    examples: [
+      {
+        input: "60000",
+        formula: "=IF(A2>50000,'Bonus','No Bonus')",
+        output: "Bonus",
+      },
+    ],
+
+    related: ["sumifs", "countifs"],
   },
+
 
   {
     slug: "sumifs",
