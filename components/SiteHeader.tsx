@@ -14,7 +14,7 @@ export default function SiteHeader() {
           </Link>
 
           <p className="text-xs text-slate-400 mt-1">
-            AI Data Storytelling Platform
+            AI Data Analysis and Storytelling Platform
           </p>
         </div>
 
