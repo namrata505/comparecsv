@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formulas } from "@//app/lib/formulas";
+import { formulas } from "@/lib/formulas";
 
 export const metadata = {
   title: "Excel Formula Library | CompareCSV",

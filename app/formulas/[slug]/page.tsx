@@ -1,4 +1,4 @@
-import { formulas } from "@/app/lib/formulas";
+import { formulas } from "@/lib/formulas";
 import { notFound } from "next/navigation";
 
 type Props = {
