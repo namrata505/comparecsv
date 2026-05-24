@@ -1,17 +1,23 @@
-"use client";
-
 import { Copy } from "lucide-react";
 import { formulas } from "@/lib/formulas";
 import { notFound } from "next/navigation";
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
-export default function FormulaPage({ params }: Props) {
-  const formula = formulas.find((f) => f.slug === params.slug);
+export async function generateStaticParams() {
+  return formulas.map((formula) => ({
+    slug: formula.slug,
+  }));
+}
+
+export default async function FormulaPage({ params }: Props) {
+  const { slug } = await params;
+
+  const formula = formulas.find((f) => f.slug === slug);
 
   if (!formula) {
     notFound();
@@ -21,8 +27,6 @@ export default function FormulaPage({ params }: Props) {
     <main className="min-h-screen bg-slate-950 text-white">
 
       <section className="max-w-5xl mx-auto px-6 py-20">
-
-        {/* Title */}
 
         <h1 className="text-5xl font-bold mb-6">
           {formula.title}
@@ -43,8 +47,10 @@ export default function FormulaPage({ params }: Props) {
             </h2>
 
             <button
-              onClick={() => navigator.clipboard.writeText(formula.syntax)}
-              className="flex items-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-black px-4 py-2 rounded-xl font-medium transition"
+              onClick={() =>
+                navigator.clipboard.writeText(formula.syntax)
+              }
+              className="flex items-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-black px-4 py-2 rounded-xl font-medium"
             >
               <Copy size={18} />
               Copy
@@ -72,21 +78,6 @@ export default function FormulaPage({ params }: Props) {
 
         </div>
 
-        {/* Playground */}
-
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 mb-10">
-
-          <h2 className="text-2xl font-semibold mb-6">
-            Try Formula
-          </h2>
-
-          <textarea
-            placeholder="Type your Excel formula here..."
-            className="w-full h-40 rounded-2xl bg-black/40 border border-white/10 p-6 outline-none text-cyan-300 font-mono"
-          />
-
-        </div>
-
         {/* Content */}
 
         <div className="text-slate-300 text-lg leading-8 mb-16">
@@ -95,8 +86,7 @@ export default function FormulaPage({ params }: Props) {
 
         {/* Examples Table */}
 
-        {formula.examples && formula.examples.length > 0 && (
-
+        {formula.examples && (
           <div className="mt-16">
 
             <h2 className="text-3xl font-bold mb-6">
@@ -118,7 +108,6 @@ export default function FormulaPage({ params }: Props) {
                 <tbody>
 
                   {formula.examples.map((item, index) => (
-
                     <tr
                       key={index}
                       className="border-t border-white/10"
@@ -137,7 +126,6 @@ export default function FormulaPage({ params }: Props) {
                       </td>
 
                     </tr>
-
                   ))}
 
                 </tbody>
@@ -147,43 +135,6 @@ export default function FormulaPage({ params }: Props) {
             </div>
 
           </div>
-
-        )}
-
-        {/* Related Formulas */}
-
-        {formula.related && formula.related.length > 0 && (
-
-          <div className="mt-20">
-
-            <h2 className="text-3xl font-bold mb-8">
-              Related Formulas
-            </h2>
-
-            <div className="flex flex-wrap gap-4">
-
-              {formula.related.map((slug) => {
-                const relatedFormula = formulas.find(
-                  (f) => f.slug === slug
-                );
-
-                if (!relatedFormula) return null;
-
-                return (
-                  <a
-                    key={slug}
-                    href={`/formulas/${slug}`}
-                    className="rounded-2xl border border-white/10 bg-white/5 px-6 py-4 hover:border-cyan-400/40 transition"
-                  >
-                    {relatedFormula.title}
-                  </a>
-                );
-              })}
-
-            </div>
-
-          </div>
-
         )}
 
       </section>
