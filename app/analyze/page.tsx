@@ -21,9 +21,13 @@ export default function AnalyzePage() {
   const [files, setFiles] = useState<File[]>([]);
   const [rows, setRows] = useState<any[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
+
   const [loading, setLoading] = useState(false);
+
   const [prompt, setPrompt] = useState("");
+
   const [aiResult, setAiResult] = useState("");
+
   const [mode, setMode] = useState("Insights");
 
   async function handleFiles(selectedFiles: FileList | null) {
@@ -63,7 +67,7 @@ export default function AnalyzePage() {
           ];
         }
 
-        // Excel
+        // XLSX
         if (
           extension === "xlsx" ||
           extension === "xls"
@@ -89,12 +93,60 @@ export default function AnalyzePage() {
       setRows(combinedRows);
 
       if (combinedRows.length > 0) {
+
         setHeaders(Object.keys(combinedRows[0]));
+
       }
 
     } catch (error) {
 
       console.error(error);
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  }
+
+  async function handleAIAnalysis() {
+
+    if (!rows.length) return;
+
+    try {
+
+      setLoading(true);
+
+      setAiResult("");
+
+      const response = await fetch("/api/analyze", {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          prompt,
+          rows,
+          headers,
+          mode,
+        }),
+
+      });
+
+      const data = await response.json();
+
+      setAiResult(data.result);
+
+    } catch (error) {
+
+      console.error(error);
+
+      setAiResult(
+        "AI analysis could not be generated."
+      );
 
     } finally {
 
@@ -131,7 +183,9 @@ export default function AnalyzePage() {
 
     const duplicateCount =
       totalRows -
-      new Set(rows.map((row) => JSON.stringify(row))).size;
+      new Set(
+        rows.map((row) => JSON.stringify(row))
+      ).size;
 
     const numericColumns = headers.filter((header) => {
 
@@ -258,7 +312,7 @@ export default function AnalyzePage() {
 
           <div className="mt-10 text-center text-cyan-300 text-lg">
 
-            Analyzing uploaded files...
+            Processing dataset...
 
           </div>
 
@@ -275,161 +329,53 @@ export default function AnalyzePage() {
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
 
               <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-
                 <Database className="mb-4 text-cyan-400" />
-
                 <div className="text-4xl font-bold mb-2">
-
                   {insights.totalRows}
-
                 </div>
-
                 <div className="text-slate-400">
-
                   Total Rows
-
                 </div>
-
               </div>
 
               <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-
                 <FileSpreadsheet className="mb-4 text-cyan-400" />
-
                 <div className="text-4xl font-bold mb-2">
-
                   {insights.totalColumns}
-
                 </div>
-
                 <div className="text-slate-400">
-
                   Columns
-
                 </div>
-
               </div>
 
               <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-
                 <AlertTriangle className="mb-4 text-cyan-400" />
-
                 <div className="text-4xl font-bold mb-2">
-
                   {insights.missingValues}
-
                 </div>
-
                 <div className="text-slate-400">
-
                   Missing Values
-
                 </div>
-
               </div>
 
               <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-
                 <BarChart3 className="mb-4 text-cyan-400" />
-
                 <div className="text-4xl font-bold mb-2">
-
                   {insights.duplicateCount}
-
                 </div>
-
                 <div className="text-slate-400">
-
                   Duplicates
-
                 </div>
-
               </div>
 
             </section>
 
-            {/* AI INSIGHTS */}
-
-            <section className="mt-16 grid lg:grid-cols-2 gap-8">
-
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-10">
-
-                <h2 className="text-3xl font-bold mb-8">
-
-                  AI Dataset Insights
-
-                </h2>
-
-                <div className="space-y-5">
-
-                  {insights.topInsights.map((item, index) => (
-
-                    <div
-                      key={index}
-                      className="rounded-2xl border border-white/10 bg-black/20 p-5 text-slate-300 leading-7"
-                    >
-
-                      {item}
-
-                    </div>
-
-                  ))}
-
-                </div>
-
-              </div>
-
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-10">
-
-                <h2 className="text-3xl font-bold mb-8">
-
-                  Content Creator Summary
-
-                </h2>
-
-                <div className="space-y-6 text-slate-300 leading-8">
-
-                  <p>
-
-                    The uploaded spreadsheet dataset contains
-                    <span className="text-cyan-400 font-semibold">
-                      {` ${insights.totalRows} `}
-                    </span>
-                    records across
-                    <span className="text-cyan-400 font-semibold">
-                      {` ${insights.totalColumns} `}
-                    </span>
-                    columns.
-
-                  </p>
-
-                  <p>
-
-                    Automated analysis detected
-                    <span className="text-cyan-400 font-semibold">
-                      {` ${insights.missingValues} missing values `}
-                    </span>
-                    and
-                    <span className="text-cyan-400 font-semibold">
-                      {` ${insights.duplicateCount} possible duplicate rows`}
-                    </span>.
-
-                  </p>
-
-                </div>
-
-              </div>
-
-            </section>
-
-            {/* TABLE */}
+            {/* DATASET TABLE */}
 
             <section className="mt-16 rounded-3xl border border-white/10 bg-white/5 p-10 overflow-x-auto">
 
               <h2 className="text-3xl font-bold mb-8">
-
                 Dataset Preview
-
               </h2>
 
               <table className="w-full text-left">
@@ -444,9 +390,7 @@ export default function AnalyzePage() {
                         key={header}
                         className="p-4 text-cyan-300"
                       >
-
                         {header}
-
                       </th>
 
                     ))}
@@ -470,9 +414,7 @@ export default function AnalyzePage() {
                           key={header}
                           className="p-4 text-slate-300"
                         >
-
                           {String(row[header] ?? "")}
-
                         </td>
 
                       ))}
@@ -494,14 +436,107 @@ export default function AnalyzePage() {
               headers={headers}
             />
 
-            {/* AI GENERATOR */}
+            {/* AI CONTENT */}
 
             <AIContentGenerator
               rows={rows}
               headers={headers}
             />
 
+            {/* AI PROMPT */}
 
+            <section className="mt-20">
+
+              <h2 className="text-4xl font-bold mb-8">
+                Ask AI About Your Dataset
+              </h2>
+
+              <div className="flex flex-wrap gap-4 mb-6">
+
+                {[
+                  "Insights",
+                  "Blog",
+                  "YouTube",
+                  "LinkedIn",
+                  "Report",
+                  "SEO Article",
+                ].map((item) => (
+
+                  <button
+                    key={item}
+                    onClick={() => setMode(item)}
+                    className={`rounded-2xl px-5 py-3 font-medium transition ${
+                      mode === item
+                        ? "bg-cyan-500 text-black"
+                        : "border border-white/10 bg-white/5 hover:border-cyan-400/40"
+                    }`}
+                  >
+                    {item}
+                  </button>
+
+                ))}
+
+              </div>
+
+              <textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Example: Generate business insights, summarize trends, create a YouTube script..."
+                className="
+                  w-full
+                  h-44
+                  rounded-3xl
+                  border
+                  border-cyan-400/20
+                  bg-slate-900
+                  p-6
+                  outline-none
+                  text-white
+                  placeholder:text-slate-500
+                  focus:border-cyan-400
+                  focus:ring-2
+                  focus:ring-cyan-400/20
+                "
+              />
+
+              <button
+                onClick={handleAIAnalysis}
+                className="mt-6 rounded-2xl bg-cyan-500 hover:bg-cyan-400 transition px-8 py-4 font-semibold text-black"
+              >
+                Generate AI Analysis
+              </button>
+
+            </section>
+
+            {/* AI OUTPUT */}
+
+            {aiResult && (
+
+              <section className="mt-16">
+
+                <div className="rounded-3xl border border-cyan-400/20 bg-cyan-500/10 p-10">
+
+                  <div className="flex items-center justify-between mb-6">
+
+                    <h2 className="text-3xl font-bold">
+                      AI Generated Output
+                    </h2>
+
+                    <div className="rounded-full bg-cyan-400/20 px-4 py-2 text-sm text-cyan-300">
+                      {mode}
+                    </div>
+
+                  </div>
+
+                  <div className="whitespace-pre-wrap text-slate-200 leading-8 text-lg">
+                    {aiResult}
+                  </div>
+
+                </div>
+
+              </section>
+
+            )}
 
           </>
 
@@ -509,38 +544,8 @@ export default function AnalyzePage() {
 
       </section>
 
-      {/* AI PROMPT BOX */}
-
-      <section className="mt-16">
-
-        <h2 className="text-3xl font-bold mb-6">
-          Ask AI About Your Dataset
-        </h2>
-
-        <textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Example: Generate business insights, write a YouTube script, summarize trends..."
-          className="
-            w-full
-            h-44
-            rounded-3xl
-            border
-            border-cyan-400/20
-            bg-slate-900
-            p-6
-            outline-none
-            text-white
-            placeholder:text-slate-500
-            focus:border-cyan-400
-            focus:ring-2
-            focus:ring-cyan-400/20
-          "
-        />
-
-      </section>
-
     </main>
 
   );
+
 }
