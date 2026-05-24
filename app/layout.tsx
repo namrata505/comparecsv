@@ -1,6 +1,15 @@
+import Script from "next/script";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+
+<Script
+  async
+  strategy="afterInteractive"
+  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2947992394825647"
+  crossOrigin="anonymous"
+/>
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

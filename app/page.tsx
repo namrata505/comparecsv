@@ -1,4 +1,5 @@
 import FileUpload from "@/components/FileUpload";
+import AdBanner from "@/components/AdBanner";
 
 export default function Home() {
   return (
@@ -25,6 +26,8 @@ export default function Home() {
 
         </div>
       </header>
+
+      <AdBanner slot="1111111111" />
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-6 pt-24 pb-20 text-center">
@@ -59,10 +62,10 @@ export default function Home() {
 
         <div className="mt-20 max-w-4xl mx-auto">
           <FileUpload />
+          <AdBanner slot="2222222222" />
         </div>
 
       </section>
-
 
       <section className="max-w-5xl mx-auto px-6 py-16 text-gray-700">
         <h2 className="text-3xl font-bold text-white mb-4">
@@ -143,6 +146,8 @@ export default function Home() {
             CompareCSV helps users compare spreadsheets online without installing Excel.
             Upload CSV or XLSX files and instantly detect differences, duplicates, and missing data.
           </p>
+          
+          <AdBanner slot="3333333333" />
 
           <p className="text-slate-300 leading-7">
             Used for HR, finance, inventory, and data analysis workflows.
