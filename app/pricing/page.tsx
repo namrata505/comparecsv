@@ -17,9 +17,11 @@ export default function PricingPage() {
 
       if (data.url) {
         window.location.href = data.url;
-      } else {
-        alert("Checkout could not be created.");
+        return;
       }
+
+      console.error("Checkout error:", data);
+      alert(JSON.stringify(data, null, 2));
     } catch (error) {
       console.error(error);
       alert("Something went wrong.");
@@ -88,7 +90,7 @@ export default function PricingPage() {
             </p>
 
             <div className="text-5xl font-bold mb-8">
-              $12
+              $5
               <span className="text-lg text-slate-400 font-normal">
                 /month
               </span>

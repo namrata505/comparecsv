@@ -9,7 +9,14 @@ export async function POST() {
 
     if (!apiKey || !storeId || !variantId) {
       return NextResponse.json(
-        { error: "Lemon Squeezy environment variables are missing." },
+        {
+          error: "Missing environment variables",
+          details: {
+            hasApiKey: Boolean(apiKey),
+            storeId,
+            variantId,
+          },
+        },
         { status: 500 }
       );
     }
@@ -25,16 +32,6 @@ export async function POST() {
         data: {
           type: "checkouts",
           attributes: {
-            checkout_options: {
-              embed: false,
-              media: false,
-              logo: true,
-            },
-            checkout_data: {
-              custom: {
-                source: "comparecsv_pricing_page",
-              },
-            },
             product_options: {
               redirect_url: `${appUrl}/payment-success`,
               receipt_button_text: "Go to CompareCSV",
@@ -45,13 +42,13 @@ export async function POST() {
             store: {
               data: {
                 type: "stores",
-                id: storeId,
+                id: String(storeId),
               },
             },
             variant: {
               data: {
                 type: "variants",
-                id: variantId,
+                id: String(variantId),
               },
             },
           },
@@ -63,7 +60,10 @@ export async function POST() {
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: data },
+        {
+          error: "Lemon Squeezy checkout failed",
+          details: data,
+        },
         { status: response.status }
       );
     }
@@ -75,7 +75,10 @@ export async function POST() {
     console.error(error);
 
     return NextResponse.json(
-      { error: "Failed to create checkout." },
+      {
+        error: "Failed to create checkout",
+        details: String(error),
+      },
       { status: 500 }
     );
   }
