@@ -57,9 +57,13 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body>{children}</body>
+        <body>
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+        </body>
       </html>
-    </ClerkProvider>   
+    </ClerkProvider> 
   );
 }
 
