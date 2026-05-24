@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
+
+import {
+  SignInButton,
+  UserButton,
+  useUser,
+} from "@clerk/nextjs";
 
 export default function SiteHeader() {
   const { isSignedIn } = useUser();
@@ -10,6 +15,8 @@ export default function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between gap-6">
+
+        {/* Logo */}
         <div>
           <Link
             href="/"
@@ -19,37 +26,69 @@ export default function SiteHeader() {
           </Link>
 
           <p className="text-xs text-slate-400 mt-1">
-            AI Data Analysis and Storytelling Platform
+            AI Data Storytelling Platform
           </p>
         </div>
 
+        {/* Navigation */}
         <nav className="hidden md:flex items-center gap-8 text-sm text-slate-300">
-          <Link href="/" className="hover:text-cyan-400 transition">
+
+          <Link
+            href="/"
+            className="hover:text-cyan-400 transition"
+          >
             Home
           </Link>
 
-          <Link href="/analyze" className="hover:text-cyan-400 transition">
+          <Link
+            href="/analyze"
+            className="hover:text-cyan-400 transition"
+          >
             AI Analyzer
           </Link>
 
-          <Link href="/formulas" className="hover:text-cyan-400 transition">
+          <Link
+            href="/formulas"
+            className="hover:text-cyan-400 transition"
+          >
             Formulas
           </Link>
 
-          <Link href="/pricing" className="hover:text-cyan-400 transition">
+          <Link
+            href="/pricing"
+            className="hover:text-cyan-400 transition"
+          >
             Pricing
           </Link>
 
-          <Link href="/about" className="hover:text-cyan-400 transition">
+          {isSignedIn && (
+            <Link
+              href="/dashboard"
+              className="hover:text-cyan-400 transition"
+            >
+              Dashboard
+            </Link>
+          )}
+
+          <Link
+            href="/about"
+            className="hover:text-cyan-400 transition"
+          >
             About
           </Link>
 
-          <Link href="/contact" className="hover:text-cyan-400 transition">
+          <Link
+            href="/contact"
+            className="hover:text-cyan-400 transition"
+          >
             Contact
           </Link>
+
         </nav>
 
+        {/* Right Side */}
         <div className="flex items-center gap-3">
+
           {!isSignedIn && (
             <SignInButton mode="modal">
               <button className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-white font-semibold hover:border-cyan-400/40 transition">
@@ -58,7 +97,9 @@ export default function SiteHeader() {
             </SignInButton>
           )}
 
-          {isSignedIn && <UserButton />}
+          {isSignedIn && (
+            <UserButton />
+          )}
 
           <Link
             href="/analyze"
@@ -67,7 +108,9 @@ export default function SiteHeader() {
             Start Analysis
             <ArrowRight size={18} />
           </Link>
+
         </div>
+
       </div>
     </header>
   );

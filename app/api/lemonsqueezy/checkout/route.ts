@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { currentUser } from "@clerk/nextjs/server";
 
 export async function POST() {
   try {
@@ -28,8 +29,10 @@ export async function POST() {
         "Content-Type": "application/vnd.api+json",
         Authorization: `Bearer ${apiKey}`,
       },
+      
       body: JSON.stringify({
         data: {
+          
           type: "checkouts",
           attributes: {
             product_options: {
