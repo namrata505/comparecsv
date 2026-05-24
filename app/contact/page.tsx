@@ -1,11 +1,49 @@
+"use client";
+
+import { useState } from "react";
+
 export default function ContactPage() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    setLoading(true);
+    setStatus("");
+
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, email, message }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setStatus("Message sent successfully.");
+      setName("");
+      setEmail("");
+      setMessage("");
+    } else {
+      setStatus(data.error || "Something went wrong.");
+    }
+
+    setLoading(false);
+  }
+
   return (
     <main className="min-h-screen bg-slate-950 text-white">
 
       <section className="max-w-5xl mx-auto px-6 py-24">
 
         <div className="inline-flex items-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-cyan-300 text-sm mb-8">
-          Contact:Comparecsv-AI Storytelling Platform
+          Contact : CompareCSV - AI Storytelling Platform
         </div>
 
         <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-10">
@@ -20,7 +58,7 @@ export default function ContactPage() {
         <div className="space-y-8 text-slate-300 text-lg leading-8">
 
           <p>
-            CompareCSV is continuously evolving to help users analyze,
+            CompareCSV - AI Storytelling Platform is continuously evolving to help users analyze,
             compare, and transform spreadsheet data using modern AI workflows.
           </p>
 
@@ -103,30 +141,49 @@ export default function ContactPage() {
 
           <div className="space-y-6">
 
-            <input
-              type="text"
-              placeholder="Your Name"
-              className="w-full rounded-2xl border border-white/10 bg-slate-900 p-5 outline-none text-white placeholder:text-slate-500"
-            />
+            <form onSubmit={handleSubmit} className="space-y-6">
 
-            <input
-              type="email"
-              placeholder="Your Email"
-              className="w-full rounded-2xl border border-white/10 bg-slate-900 p-5 outline-none text-white placeholder:text-slate-500"
-            />
+              <input
+                type="text"
+                placeholder="Your Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full rounded-2xl border border-white/10 bg-slate-900 p-5 outline-none text-white placeholder:text-slate-500"
+                required
+              />
 
-            <textarea
-              placeholder="Your Message"
-              className="w-full h-44 rounded-2xl border border-white/10 bg-slate-900 p-5 outline-none text-white placeholder:text-slate-500"
-            />
+              <input
+                type="email"
+                placeholder="Your Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-2xl border border-white/10 bg-slate-900 p-5 outline-none text-white placeholder:text-slate-500"
+                required
+              />
 
-            <button
-              className="rounded-2xl bg-cyan-500 hover:bg-cyan-400 transition px-8 py-4 text-black font-semibold"
-            >
-              Send Message
-            </button>
+              <textarea
+                placeholder="Your Message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="w-full h-44 rounded-2xl border border-white/10 bg-slate-900 p-5 outline-none text-white placeholder:text-slate-500"
+                required
+              />
 
-          </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="rounded-2xl bg-cyan-500 hover:bg-cyan-400 disabled:opacity-60 transition px-8 py-4 text-black font-semibold"
+              >
+                {loading ? "Sending..." : "Send Message"}
+              </button>
+
+              {status && (
+                <p className="text-cyan-300">
+                  {status}
+                </p>
+              )}
+
+            </form>
 
         </div>
 
