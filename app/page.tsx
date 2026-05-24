@@ -67,11 +67,6 @@ export default function HomePage() {
           <div className="mt-14 flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
 
             <div className="flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-cyan-400" />
-              No Signup Required
-            </div>
-
-            <div className="flex items-center gap-2">
               <Shield size={16} className="text-cyan-400" />
               Secure File Processing
             </div>

@@ -36,6 +36,10 @@ export default function SiteHeader() {
             Formulas
           </Link>
 
+          <Link href="/pricing" className="hover:text-cyan-400 transition">
+            Pricing
+          </Link>
+
           <Link href="/about" className="hover:text-cyan-400 transition">
             About
           </Link>

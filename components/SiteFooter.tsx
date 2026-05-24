@@ -19,6 +19,9 @@ export default function SiteFooter() {
           <Link href="/formulas" className="hover:text-cyan-400 transition">
             Formula Library
           </Link>
+          <Link href="/pricing" className="hover:text-cyan-400 transition">
+            Pricing
+          </Link>
           <Link href="/about" className="hover:text-cyan-400 transition">
             About
           </Link>
