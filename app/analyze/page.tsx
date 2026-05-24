@@ -22,6 +22,9 @@ export default function AnalyzePage() {
   const [rows, setRows] = useState<any[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [prompt, setPrompt] = useState("");
+  const [aiResult, setAiResult] = useState("");
+  const [mode, setMode] = useState("Insights");
 
   async function handleFiles(selectedFiles: FileList | null) {
 
@@ -498,9 +501,42 @@ export default function AnalyzePage() {
               headers={headers}
             />
 
+
+
           </>
 
         )}
+
+      </section>
+
+      {/* AI PROMPT BOX */}
+
+      <section className="mt-16">
+
+        <h2 className="text-3xl font-bold mb-6">
+          Ask AI About Your Dataset
+        </h2>
+
+        <textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="Example: Generate business insights, write a YouTube script, summarize trends..."
+          className="
+            w-full
+            h-44
+            rounded-3xl
+            border
+            border-cyan-400/20
+            bg-slate-900
+            p-6
+            outline-none
+            text-white
+            placeholder:text-slate-500
+            focus:border-cyan-400
+            focus:ring-2
+            focus:ring-cyan-400/20
+          "
+        />
 
       </section>
 
