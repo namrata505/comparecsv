@@ -85,6 +85,12 @@ export default function Home() {
         </p>
       </section>
 
+      <a
+        href="/formulas"
+        className="hover:text-cyan-400 transition"
+      >
+        Formula Library
+      </a>
       {/* Features */}
       <section className="max-w-7xl mx-auto px-6 pb-24">
 
@@ -146,7 +152,7 @@ export default function Home() {
             CompareCSV helps users compare spreadsheets online without installing Excel.
             Upload CSV or XLSX files and instantly detect differences, duplicates, and missing data.
           </p>
-          
+
           <AdBanner slot="3333333333" />
 
           <p className="text-slate-300 leading-7">
