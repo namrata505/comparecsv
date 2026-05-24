@@ -5,9 +5,18 @@ export default function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-bold tracking-tight">
-          CompareCSV
-        </Link>
+        <div>
+          <Link
+            href="/"
+            className="text-2xl font-bold tracking-tight text-white"
+          >
+            CompareCSV
+          </Link>
+
+          <p className="text-xs text-slate-400 mt-1">
+            AI Data Storytelling Platform
+          </p>
+        </div>
 
         <nav className="hidden md:flex items-center gap-8 text-sm text-slate-300">
           <Link href="/analyze" className="hover:text-cyan-400 transition">
