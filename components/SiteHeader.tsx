@@ -5,7 +5,6 @@ import { ArrowRight } from "lucide-react";
 
 import {
   SignInButton,
-  SignUpButton,
   UserButton,
   useUser,
 } from "@clerk/nextjs";
@@ -97,12 +96,6 @@ export default function SiteHeader() {
               </button>
             </SignInButton>
           )}
-
-          <SignUpButton mode="modal">
-            <button className="rounded-2xl bg-cyan-500 hover:bg-cyan-400 px-5 py-3 text-black font-semibold transition">
-              Sign Up
-            </button>
-          </SignUpButton>
 
           {isSignedIn && (
             <UserButton />
