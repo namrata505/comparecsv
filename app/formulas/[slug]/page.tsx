@@ -1,6 +1,7 @@
 
 import { formulas } from "@/lib/formulas";
 import { notFound } from "next/navigation";
+import FormulaTool from "@/components/FormulaTool";
 
 type Props = {
   params: Promise<{
@@ -71,6 +72,8 @@ export default async function FormulaPage({ params }: Props) {
           </div>
 
         </div>
+
+        <FormulaTool slug={formula.slug} />
 
         {/* Content */}
 
