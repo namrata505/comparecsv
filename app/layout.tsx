@@ -5,6 +5,7 @@ import "./globals.css";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { ClerkProvider } from "@clerk/nextjs";
+import UserSync from "@/components/UserSync";
 
 
 <Script
@@ -57,11 +58,12 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body>
-          <SiteHeader />
-          {children}
-          <SiteFooter />
-        </body>
+      <body>
+        <UserSync />
+        <SiteHeader />
+        {children}
+        <SiteFooter />
+      </body>
       </html>
     </ClerkProvider> 
   );
