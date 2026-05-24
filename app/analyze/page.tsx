@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
+import { exportAIReportPDF } from "@/lib/exportPDF";
 
 import {
   Upload,
@@ -487,6 +488,24 @@ export default function AnalyzePage() {
                   <div className="whitespace-pre-wrap text-slate-200 leading-8 text-lg">
                     {aiResult}
                   </div>
+
+                  <button
+                    onClick={() =>
+                      exportAIReportPDF({
+                        title: "CompareCSV AI Report",
+                        mode,
+                        aiResult,
+                        totalRows: insights.totalRows,
+                        totalColumns: insights.totalColumns,
+                        missingValues: insights.missingValues,
+                        duplicateCount: insights.duplicateCount,
+                      })
+                    }
+                    className="mt-8 rounded-2xl bg-cyan-500 hover:bg-cyan-400 transition px-8 py-4 font-semibold text-black"
+                  >
+                    Download PDF Report
+                  </button>
+                  
                 </div>
               </section>
             )}
