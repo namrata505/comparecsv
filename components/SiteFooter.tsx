@@ -10,10 +10,13 @@ export default function SiteFooter() {
 
         <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
           <Link href="/analyze" className="hover:text-cyan-400 transition">
+          <Link href="/" className="hover:text-cyan-400 transition">
+            Home
+          </Link>
             AI Analyzer
           </Link>
           <Link href="/formulas" className="hover:text-cyan-400 transition">
-            Formulas
+            Formula Library
           </Link>
           <Link href="/about" className="hover:text-cyan-400 transition">
             About

@@ -19,6 +19,9 @@ export default function SiteHeader() {
         </div>
 
         <nav className="hidden md:flex items-center gap-8 text-sm text-slate-300">
+          <Link href="/" className="hover:text-cyan-400 transition">
+            Home
+          </Link>
           <Link href="/analyze" className="hover:text-cyan-400 transition">
             AI Analyzer
           </Link>
