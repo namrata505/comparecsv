@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import { ClerkProvider } from "@clerk/nextjs";
 
 
 <Script
@@ -24,10 +25,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Compare CSV & Excel Files Online | Free VLOOKUP Tool",
+  title: "CompareCSV",
 
   description:
-    "CompareCSV is a free online tool to compare CSV and Excel files, find duplicates, missing rows, and export results instantly.",
+    "AI Data Analysis and Story Telling Platform",
 
   keywords: [
     "CSV compare",
@@ -54,15 +55,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body>
-        <SiteHeader />
-        {children}
-        <SiteFooter />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body>{children}</body>
+      </html>
+    </ClerkProvider>   
   );
 }
+
