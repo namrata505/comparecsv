@@ -17,6 +17,8 @@ export default function HomePage() {
         <div className="absolute top-0 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-3xl" />
       </div>
 
+
+
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
 
@@ -54,6 +56,8 @@ export default function HomePage() {
         </div>
 
       </header>
+
+
 
       {/* Hero */}
       <section className="max-w-7xl mx-auto px-6 pt-24 pb-20">
@@ -123,6 +127,176 @@ export default function HomePage() {
       </section>
 
 
+
+      {/* TRUST BAR (NEW) */}
+      <section className="max-w-7xl mx-auto px-6 py-10">
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+            <div className="text-3xl font-bold text-cyan-400 mb-2">
+              CSV
+            </div>
+            <div className="text-slate-400 text-sm">
+              Multi-file analysis
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+            <div className="text-3xl font-bold text-cyan-400 mb-2">
+              AI
+            </div>
+            <div className="text-slate-400 text-sm">
+              Automated insights
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+            <div className="text-3xl font-bold text-cyan-400 mb-2">
+              XLSX
+            </div>
+            <div className="text-slate-400 text-sm">
+              Excel support
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+            <div className="text-3xl font-bold text-cyan-400 mb-2">
+              SEO
+            </div>
+            <div className="text-slate-400 text-sm">
+              Content generation
+            </div>
+          </div>
+
+        </div>
+
+      </section>     
+
+       
+
+      {/* HOW IT WORKS (VERY IMPORTANT) */}
+      <section className="max-w-7xl mx-auto px-6 py-24">
+
+        <div className="text-center mb-16">
+
+          <h2 className="text-5xl font-bold mb-6">
+            How CompareCSV Works
+          </h2>
+
+          <p className="text-slate-400 text-lg max-w-3xl mx-auto">
+            Upload spreadsheet files, merge datasets,
+            analyze trends, and generate AI-powered insights instantly.
+          </p>
+
+        </div>
+
+        <div className="grid md:grid-cols-4 gap-6">
+
+          {[
+            {
+              step: "1",
+              title: "Upload Files",
+              text: "Upload CSV or Excel spreadsheets directly in your browser.",
+            },
+            {
+              step: "2",
+              title: "Merge Datasets",
+              text: "Select common columns and combine multiple files into one dataset.",
+            },
+            {
+              step: "3",
+              title: "Analyze Data",
+              text: "Automatically detect patterns, trends, duplicates, and insights.",
+            },
+            {
+              step: "4",
+              title: "Generate Content",
+              text: "Create reports, charts, blogs, summaries, and AI-powered outputs.",
+            },
+          ].map((item) => (
+            <div
+              key={item.step}
+              className="rounded-3xl border border-white/10 bg-white/5 p-8"
+            >
+
+              <div className="w-14 h-14 rounded-full bg-cyan-500 text-black flex items-center justify-center text-2xl font-bold mb-6">
+                {item.step}
+              </div>
+
+              <h3 className="text-2xl font-semibold mb-4">
+                {item.title}
+              </h3>
+
+              <p className="text-slate-400 leading-7">
+                {item.text}
+              </p>
+
+            </div>
+          ))}
+
+        </div>
+
+      </section>
+
+
+
+      {/* “Popular Tools” */}
+      <section className="max-w-7xl mx-auto px-6 pb-24">
+
+        <h2 className="text-4xl font-bold mb-10">
+          Popular Spreadsheet Tools
+        </h2>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          {[
+            {
+              title: "AI Spreadsheet Analyzer",
+              href: "/analyze",
+            },
+            {
+              title: "Excel Formula Library",
+              href: "/formulas",
+            },
+            {
+              title: "VLOOKUP Formula",
+              href: "/formulas/vlookup",
+            },
+            {
+              title: "XLOOKUP Formula",
+              href: "/formulas/xlookup",
+            },
+            {
+              title: "SUMIFS Formula",
+              href: "/formulas/sumifs",
+            },
+            {
+              title: "COUNTIFS Formula",
+              href: "/formulas/countifs",
+            },
+          ].map((tool) => (
+            <a
+              key={tool.title}
+              href={tool.href}
+              className="rounded-3xl border border-white/10 bg-white/5 p-8 hover:border-cyan-400/40 transition"
+            >
+              <h3 className="text-2xl font-semibold mb-3">
+                {tool.title}
+              </h3>
+
+              <p className="text-slate-400">
+                Open tool →
+              </p>
+            </a>
+          ))}
+
+        </div>
+
+      </section>
+
+
+
       {/* AI Content Generatorion Section */}
       <section className="max-w-7xl mx-auto px-6 py-20">
 
@@ -155,6 +329,7 @@ export default function HomePage() {
         </div>
 
       </section>
+
 
 
       {/* Ask AI */}
@@ -219,7 +394,6 @@ export default function HomePage() {
       
 
 
-
       {/* Features */}
       <section className="max-w-7xl mx-auto px-6 pb-24">
 
@@ -282,7 +456,8 @@ export default function HomePage() {
       </section>
 
 
-      {/* SEO Section */}
+
+      {/* SEO Section 1 */}
       <section className="max-w-6xl mx-auto px-6 pb-24">
 
         <div className="rounded-[32px] border border-white/10 bg-white/5 p-10 md:p-14 backdrop-blur-xl">
@@ -310,6 +485,47 @@ export default function HomePage() {
               Users can transform spreadsheet data into
               charts, summaries, reports, blog-ready paragraphs,
               and video talking points without installing any software.
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* SEO Section 2 */}
+      <section className="max-w-6xl mx-auto px-6 pb-24">
+
+        <div className="rounded-[32px] border border-white/10 bg-white/5 p-12">
+
+          <h2 className="text-4xl font-bold mb-8">
+            AI Spreadsheet Analysis Platform
+          </h2>
+
+          <div className="space-y-6 text-slate-300 text-lg leading-8">
+
+            <p>
+              CompareCSV is an AI-powered spreadsheet analysis platform
+              that helps users upload, compare, merge,
+              and analyze CSV and Excel datasets online.
+            </p>
+
+            <p>
+              Users can generate AI-powered business insights,
+              charts, reports, blog content,
+              YouTube talking points,
+              and spreadsheet summaries instantly.
+            </p>
+
+            <p>
+              The platform supports CSV files,
+              Excel XLSX spreadsheets,
+              multi-file dataset merging,
+              duplicate detection,
+              missing row analysis,
+              formula workflows,
+              and creator-focused analytics.
             </p>
 
           </div>
@@ -398,6 +614,15 @@ export default function HomePage() {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
+
+
+            <Link href="/analyze" className="hover:text-cyan-400 transition">
+              Compare and Analyze
+            </Link>
+
+            <Link href="/formulas" className="hover:text-cyan-400 transition">
+              Formulas
+            </Link>
 
             <Link href="/privacy-policy" className="hover:text-cyan-400 transition">
               Privacy Policy
