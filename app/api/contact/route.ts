@@ -15,16 +15,16 @@ export async function POST(req: Request) {
     }
 
     await resend.emails.send({
-      from: "CompareCSV <onboarding@resend.dev>",
+      from: "CompareCSV <support@comparecsv.org>",
       to: process.env.CONTACT_TO_EMAIL || "support@comparecsv.org",
       subject: `New Contact Message from ${name}`,
       replyTo: email,
       text: `
-Name: ${name}
-Email: ${email}
+    Name: ${name}
+    Email: ${email}
 
-Message:
-${message}
+    Message:
+    ${message}
       `,
     });
 
