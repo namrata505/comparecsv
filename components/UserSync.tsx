@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 
 export default function UserSync() {
-  const { isSignedIn, isLoaded } = useUser();
+  const { isLoaded, isSignedIn } = useUser();
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return;
