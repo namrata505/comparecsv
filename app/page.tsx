@@ -19,46 +19,6 @@ export default function HomePage() {
 
 
 
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
-
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-
-          <Link
-            href="/"
-            className="text-2xl font-bold tracking-tight"
-          >
-            CompareCSV
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-8 text-sm text-slate-300">
-            <Link href="/formulas" className="hover:text-cyan-400 transition">
-              Formulas
-            </Link>
-
-            <Link href="/about" className="hover:text-cyan-400 transition">
-              About
-            </Link>
-
-            <Link href="/contact" className="hover:text-cyan-400 transition">
-              Contact
-            </Link>
-          </nav>
-
-          <Link
-            href="/analyze"
-            className="inline-flex items-center gap-2 rounded-2xl bg-cyan-500 hover:bg-cyan-400 transition px-5 py-3 font-semibold text-black shadow-lg shadow-cyan-500/20"
-          >
-            Start Analysis
-            <ArrowRight size={18} />
-          </Link>
-
-        </div>
-
-      </header>
-
-
-
       {/* Hero */}
       <section className="max-w-7xl mx-auto px-6 pt-24 pb-20">
 
@@ -602,49 +562,6 @@ export default function HomePage() {
         </div>
 
       </section>
-
-
-      {/* Footer */}
-      <footer className="border-t border-white/10 py-12">
-
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-
-          <div className="text-slate-400 text-sm">
-            © 2026 CompareCSV. All rights reserved.
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
-
-
-            <Link href="/analyze" className="hover:text-cyan-400 transition">
-              Compare and Analyze
-            </Link>
-
-            <Link href="/formulas" className="hover:text-cyan-400 transition">
-              Formulas
-            </Link>
-
-            <Link href="/privacy-policy" className="hover:text-cyan-400 transition">
-              Privacy Policy
-            </Link>
-
-            <Link href="/terms" className="hover:text-cyan-400 transition">
-              Terms
-            </Link>
-
-            <Link href="/about" className="hover:text-cyan-400 transition">
-              About
-            </Link>
-
-            <Link href="/contact" className="hover:text-cyan-400 transition">
-              Contact
-            </Link>
-
-          </div>
-
-        </div>
-
-      </footer>
 
     </main>
   );
