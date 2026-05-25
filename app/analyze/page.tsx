@@ -84,10 +84,10 @@ export default function AnalyzePage() {
   async function handleFiles(selectedFiles: FileList | null) {
     if (!selectedFiles) return;
 
-    const uploaded = Array.from(selectedFiles).slice(0, 3);
+    const uploaded = Array.from(selectedFiles);
 
     setLoading(true);
-    setDatasets([]);
+
     setRows([]);
     setHeaders([]);
     setSelectedKey("");
@@ -97,18 +97,52 @@ export default function AnalyzePage() {
         uploaded.map((file) => parseFile(file))
       );
 
-      setDatasets(parsedDatasets);
+      const mergedDatasets = [
+        ...datasets,
+        ...parsedDatasets,
+      ].slice(0, 3);
 
-      if (parsedDatasets.length === 1) {
-        setRows(parsedDatasets[0].rows);
-        setHeaders(parsedDatasets[0].headers);
+      setDatasets(mergedDatasets);
+
+      if (mergedDatasets.length === 1) {
+        setRows(mergedDatasets[0].rows);
+        setHeaders(mergedDatasets[0].headers);
       }
+
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
     }
   }
+
+
+  function removeDataset(fileName: string) {
+    const updatedDatasets = datasets.filter(
+      (dataset) => dataset.fileName !== fileName
+    );
+
+    setDatasets(updatedDatasets);
+
+    if (updatedDatasets.length === 0) {
+      setRows([]);
+      setHeaders([]);
+      setSelectedKey("");
+      return;
+    }
+
+    if (updatedDatasets.length === 1) {
+      setRows(updatedDatasets[0].rows);
+      setHeaders(updatedDatasets[0].headers);
+      setSelectedKey("");
+      return;
+    }
+
+    setRows([]);
+    setHeaders([]);
+    setSelectedKey("");
+  }
+
 
   const commonColumns = useMemo(() => {
     if (datasets.length < 2) return [];
@@ -263,36 +297,44 @@ export default function AnalyzePage() {
           </p>
         </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-10 backdrop-blur-xl">
-          <label className="border-2 border-dashed border-cyan-400/20 rounded-3xl p-16 flex flex-col items-center justify-center text-center cursor-pointer hover:border-cyan-400/50 transition">
-            <Upload className="w-16 h-16 text-cyan-400 mb-6" />
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+              <h2 className="text-2xl font-semibold mb-2">
+                Upload CSV or Excel Files
+              </h2>
 
-            <h2 className="text-2xl font-semibold mb-3">
-              Upload 1 to 3 CSV or Excel Files
-            </h2>
-
-            <p className="text-slate-400 mb-6 max-w-xl">
-              Supports CSV, XLSX, and XLS files. If multiple files are uploaded,
-              select a common column to merge them.
-            </p>
-
-            <div className="bg-cyan-500 hover:bg-cyan-400 transition px-6 py-3 rounded-2xl text-black font-semibold">
-              Choose Files
+              <p className="text-slate-400">
+                Upload up to 3 files. Add or remove files anytime before analysis.
+              </p>
             </div>
 
-            <input
-              type="file"
-              multiple
-              accept=".csv,.xlsx,.xls"
-              className="hidden"
-              onChange={(e) => handleFiles(e.target.files)}
-            />
-          </label>
+            <label className="inline-flex items-center justify-center gap-3 rounded-2xl bg-cyan-500 hover:bg-cyan-400 transition px-6 py-4 text-black font-semibold cursor-pointer">
+              <Upload size={20} />
+              {datasets.length > 0 ? "Add More Files" : "Choose Files"}
+
+              <input
+                type="file"
+                multiple
+                accept=".csv,.xlsx,.xls"
+                className="hidden"
+                onChange={(e) => handleFiles(e.target.files)}
+              />
+            </label>
+          </div>
         </div>
 
         {datasets.length > 0 && (
-          <section className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-8">
-            <h2 className="text-2xl font-bold mb-6">Uploaded Files</h2>
+          <section className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-6">
+            <div className="flex items-center justify-between gap-4 mb-6">
+              <h2 className="text-2xl font-bold">
+                Uploaded Files
+              </h2>
+
+              <p className="text-sm text-slate-400">
+                {datasets.length}/3 files uploaded
+              </p>
+            </div>
 
             <div className="grid md:grid-cols-3 gap-4">
               {datasets.map((dataset) => (
@@ -300,12 +342,24 @@ export default function AnalyzePage() {
                   key={dataset.fileName}
                   className="rounded-2xl bg-black/30 p-5 border border-white/10"
                 >
-                  <p className="font-semibold text-cyan-300">
-                    {dataset.fileName}
-                  </p>
-                  <p className="text-slate-400 text-sm mt-2">
-                    {dataset.rows.length} rows · {dataset.headers.length} columns
-                  </p>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold text-cyan-300 break-all">
+                        {dataset.fileName}
+                      </p>
+
+                      <p className="text-slate-400 text-sm mt-2">
+                        {dataset.rows.length} rows · {dataset.headers.length} columns
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => removeDataset(dataset.fileName)}
+                      className="rounded-xl border border-red-400/20 bg-red-500/10 px-3 py-2 text-sm text-red-300 hover:bg-red-500/20 transition"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -378,23 +432,30 @@ export default function AnalyzePage() {
                 <div className="text-slate-400">Columns</div>
               </div>
 
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-                <AlertTriangle className="mb-4 text-cyan-400" />
-                <div className="text-4xl font-bold mb-2">
-                  {insights.missingValues}
+              {insights.missingValues > 0 && (
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+                  <AlertTriangle className="mb-4 text-cyan-400" />
+                  <div className="text-4xl font-bold mb-2">
+                    {insights.missingValues}
+                  </div>
+                  <div className="text-slate-400">
+                    Missing Values
+                  </div>
                 </div>
-                <div className="text-slate-400">Missing Values</div>
-              </div>
+              )}
 
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-                <BarChart3 className="mb-4 text-cyan-400" />
-                <div className="text-4xl font-bold mb-2">
-                  {insights.duplicateCount}
+              {insights.duplicateCount > 0 && (
+                <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+                  <BarChart3 className="mb-4 text-cyan-400" />
+                  <div className="text-4xl font-bold mb-2">
+                    {insights.duplicateCount}
+                  </div>
+                  <div className="text-slate-400">
+                    Duplicates
+                  </div>
                 </div>
-                <div className="text-slate-400">Duplicates</div>
-              </div>
+              )}
             </section>
-
 
             <ChartsPanel rows={rows} headers={headers} />
 
