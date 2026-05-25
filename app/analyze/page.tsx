@@ -30,6 +30,9 @@ export default function AnalyzePage() {
   const [headers, setHeaders] = useState<string[]>([]);
 
   const [selectedKey, setSelectedKey] = useState("");
+
+  const [manualKeys, setManualKeys] = useState<string[]>([]);
+
   const [loading, setLoading] = useState(false);
 
   const [prompt, setPrompt] = useState("");
@@ -128,6 +131,7 @@ export default function AnalyzePage() {
       setRows([]);
       setHeaders([]);
       setSelectedKey("");
+      setManualKeys([]);
       return;
     }
 
@@ -135,12 +139,14 @@ export default function AnalyzePage() {
       setRows(updatedDatasets[0].rows);
       setHeaders(updatedDatasets[0].headers);
       setSelectedKey("");
+      setManualKeys([]);
       return;
     }
 
     setRows([]);
     setHeaders([]);
     setSelectedKey("");
+    setManualKeys([]);
   }
 
 
@@ -154,52 +160,48 @@ export default function AnalyzePage() {
     );
   }, [datasets]);
 
-  function mergeDatasetsByKey(key: string) {
-    if (!key || datasets.length === 0) return;
-
-    if (datasets.length === 1) {
-      setRows(datasets[0].rows);
-      setHeaders(datasets[0].headers);
-      return;
-    }
+  function mergeDatasetsByKey(key?: string) {
+    if (datasets.length < 2) return;
 
     const baseDataset = datasets[0];
 
-    const mergedRows = baseDataset.rows.map((baseRow) => {
-      let mergedRow: any = {
-        ...baseRow,
-      };
+    const keysToUse =
+      key && key !== ""
+        ? datasets.map(() => key)
+        : manualKeys;
 
-      const keyValue = String(baseRow[key] ?? "").trim();
+    if (keysToUse.length !== datasets.length) return;
+
+    const mergedRows = baseDataset.rows.map((baseRow) => {
+      const mergedRow: any = { ...baseRow };
+      const baseKey = keysToUse[0];
+      const baseValue = String(baseRow[baseKey] ?? "").trim();
 
       datasets.slice(1).forEach((dataset, datasetIndex) => {
+        const compareKey = keysToUse[datasetIndex + 1];
+
         const matchedRow = dataset.rows.find(
-          (row) => String(row[key] ?? "").trim() === keyValue
+          (row) => String(row[compareKey] ?? "").trim() === baseValue
         );
 
         dataset.headers.forEach((header) => {
-          if (header === key) return;
+          if (header === compareKey) return;
 
-          const newHeader = `${dataset.fileName}_${header}`;
-
-          mergedRow[newHeader] = matchedRow ? matchedRow[header] ?? "" : "";
+          mergedRow[`${dataset.fileName}_${header}`] = matchedRow
+            ? matchedRow[header] ?? ""
+            : "";
         });
 
-        if (!matchedRow) {
-          mergedRow[`Match_Status_File_${datasetIndex + 2}`] = "Missing";
-        } else {
-          mergedRow[`Match_Status_File_${datasetIndex + 2}`] = "Matched";
-        }
+        mergedRow[`Match_Status_File_${datasetIndex + 2}`] = matchedRow
+          ? "Matched"
+          : "Missing";
       });
 
       return mergedRow;
     });
 
-    const mergedHeaders =
-      mergedRows.length > 0 ? Object.keys(mergedRows[0]) : [];
-
     setRows(mergedRows);
-    setHeaders(mergedHeaders);
+    setHeaders(mergedRows.length > 0 ? Object.keys(mergedRows[0]) : []);
   }
 
   async function handleAIAnalysis() {
@@ -371,12 +373,17 @@ export default function AnalyzePage() {
             <div className="flex items-center gap-3 mb-6">
               <Merge className="text-cyan-300" />
               <h2 className="text-2xl font-bold">
-                Select Common Column to Merge Files
+                Select Columns to Merge Files
               </h2>
             </div>
 
-            {commonColumns.length > 0 ? (
+            {commonColumns.length > 0 && (
               <>
+                <p className="text-slate-300 mb-4">
+                  Common columns were detected automatically. You can use one of them
+                  or select columns manually below.
+                </p>
+
                 <select
                   value={selectedKey}
                   onChange={(e) => setSelectedKey(e.target.value)}
@@ -396,14 +403,60 @@ export default function AnalyzePage() {
                   disabled={!selectedKey}
                   className="mt-6 rounded-2xl bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 transition px-8 py-4 font-semibold text-black"
                 >
-                  Merge Files & Analyze Result
+                  Merge Using Common Column
                 </button>
               </>
-            ) : (
-              <p className="text-slate-300">
-                No common columns were found across uploaded files.
-              </p>
             )}
+
+            <div className="mt-8 rounded-3xl border border-white/10 bg-black/20 p-6">
+              <h3 className="text-xl font-semibold mb-4">
+                Manual Column Selection
+              </h3>
+
+              <p className="text-slate-400 mb-6">
+                Select one matching column from each uploaded file. File 1 is treated
+                as the main dataset.
+              </p>
+
+              <div className="grid md:grid-cols-3 gap-4">
+                {datasets.map((dataset, index) => (
+                  <div key={dataset.fileName}>
+                    <label className="block text-sm text-slate-400 mb-2">
+                      {dataset.fileName}
+                    </label>
+
+                    <select
+                      value={manualKeys[index] || ""}
+                      onChange={(e) => {
+                        const updated = [...manualKeys];
+                        updated[index] = e.target.value;
+                        setManualKeys(updated);
+                      }}
+                      className="w-full rounded-2xl border border-white/10 bg-slate-900 p-4 text-white outline-none"
+                    >
+                      <option value="">Select column</option>
+
+                      {dataset.headers.map((header) => (
+                        <option key={header} value={header}>
+                          {header}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                onClick={() => mergeDatasetsByKey()}
+                disabled={
+                  manualKeys.length !== datasets.length ||
+                  manualKeys.some((key) => !key)
+                }
+                className="mt-6 rounded-2xl bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 transition px-8 py-4 font-semibold text-black"
+              >
+                Merge Using Selected Columns
+              </button>
+            </div>
           </section>
         )}
 
