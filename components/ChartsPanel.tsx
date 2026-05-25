@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -22,411 +22,379 @@ type Props = {
   headers: string[];
 };
 
-const COLORS = {
-  primary: "#06b6d4",
-  success: "#22c55e",
-  warning: "#f59e0b",
-  danger: "#ef4444",
-  purple: "#8b5cf6",
-  blue: "#3b82f6",
-  slate: "#94a3b8",
+type ChartItem = {
+  type: "bar" | "pie" | "line";
+  title: string;
+  categoryColumn?: string;
+  numericColumn?: string;
+  dateColumn?: string;
+  description: string;
 };
 
-const CATEGORY_COLORS = [
-  COLORS.primary,
-  COLORS.success,
-  COLORS.warning,
-  COLORS.purple,
-  COLORS.blue,
-  COLORS.danger,
+type ChartPlan = {
+  datasetTitle: string;
+  datasetType: string;
+  summary: string;
+  categoryColumn: string;
+  numericColumn: string;
+  dateColumn: string;
+  statusColumn: string;
+  charts: ChartItem[];
+  insights: string[];
+};
+
+const COLORS = [
+  "#06b6d4",
+  "#22c55e",
+  "#f59e0b",
+  "#8b5cf6",
+  "#3b82f6",
+  "#ef4444",
+  "#14b8a6",
+  "#eab308",
 ];
 
+function isNumber(value: any) {
+  return value !== "" && value !== null && value !== undefined && !isNaN(Number(value));
+}
+
+function buildBarData(rows: any[], categoryColumn: string, numericColumn: string) {
+  const grouped: Record<string, number> = {};
+
+  rows.forEach((row) => {
+    const key = String(row[categoryColumn] || "Unknown");
+    const value = Number(row[numericColumn] || 0);
+
+    grouped[key] = (grouped[key] || 0) + value;
+  });
+
+  return Object.entries(grouped)
+    .map(([name, value]) => ({ name: name.slice(0, 28), value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 12);
+}
+
+function buildPieData(rows: any[], categoryColumn: string) {
+  const grouped: Record<string, number> = {};
+
+  rows.forEach((row) => {
+    const key = String(row[categoryColumn] || "Unknown");
+    grouped[key] = (grouped[key] || 0) + 1;
+  });
+
+  return Object.entries(grouped)
+    .map(([name, value]) => ({ name: name.slice(0, 28), value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 8);
+}
+
+function buildLineData(rows: any[], dateColumn: string, numericColumn: string) {
+  const grouped: Record<string, number> = {};
+
+  rows.forEach((row) => {
+    const rawDate = row[dateColumn];
+
+    if (!rawDate) return;
+
+    const key = String(rawDate).slice(0, 10);
+    const value = Number(row[numericColumn] || 0);
+
+    grouped[key] = (grouped[key] || 0) + value;
+  });
+
+  return Object.entries(grouped)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .slice(0, 30);
+}
+
+function fallbackPlan(rows: any[], headers: string[]): ChartPlan {
+  const numericColumn =
+    headers.find((header) => rows.some((row) => isNumber(row[header]))) || "";
+
+  const categoryColumn =
+    headers.find((header) => header !== numericColumn) || headers[0] || "";
+
+  return {
+    datasetTitle: "Spreadsheet Dataset Analysis",
+    datasetType: "general",
+    summary:
+      "This dataset has been analyzed using available columns. CompareCSV generated practical charts based on detected category and numeric fields.",
+    categoryColumn,
+    numericColumn,
+    dateColumn: "",
+    statusColumn: "",
+    charts: [
+      numericColumn && categoryColumn
+        ? {
+            type: "bar",
+            title: `${numericColumn} by ${categoryColumn}`,
+            categoryColumn,
+            numericColumn,
+            description:
+              "This chart compares numeric values across categories to highlight the largest and smallest groups.",
+          }
+        : {
+            type: "pie",
+            title: `Distribution by ${categoryColumn}`,
+            categoryColumn,
+            description:
+              "This chart shows how records are distributed across the selected category.",
+          },
+      {
+        type: "pie",
+        title: `Record Distribution by ${categoryColumn}`,
+        categoryColumn,
+        description:
+          "This distribution helps understand which groups appear most often in the uploaded dataset.",
+      },
+    ].filter(Boolean) as ChartItem[],
+    insights: [
+      `The dataset contains ${rows.length} rows and ${headers.length} columns.`,
+      numericColumn
+        ? `The detected numeric column is ${numericColumn}.`
+        : "No strong numeric column was detected.",
+      categoryColumn
+        ? `The detected category column is ${categoryColumn}.`
+        : "No strong category column was detected.",
+    ],
+  };
+}
+
 export default function ChartsPanel({ rows, headers }: Props) {
-  const analysis = useMemo(() => {
-    if (!rows.length || !headers.length) return null;
+  const [plan, setPlan] = useState<ChartPlan | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-    const numericColumns = headers.filter((header) =>
-      rows.some((row) => {
-        const value = row[header];
-        return value !== "" && value !== null && !isNaN(Number(value));
-      })
-    );
+  useEffect(() => {
+    async function generatePlan() {
+      if (!rows.length || !headers.length) return;
 
-    const textColumns = headers.filter(
-      (header) => !numericColumns.includes(header)
-    );
+      setLoading(true);
+      setError("");
 
-    const firstNumeric = numericColumns[0];
-    const firstCategory = textColumns[0] || headers[0];
+      try {
+        const response = await fetch("/api/ai-chart-plan", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            rows,
+            headers,
+          }),
+        });
 
-    const numericChartData = rows.slice(0, 12).map((row, index) => ({
-      name: row[firstCategory]
-        ? String(row[firstCategory]).slice(0, 18)
-        : `Row ${index + 1}`,
-      value: Number(row[firstNumeric]) || 0,
-    }));
+        const data = await response.json();
 
-    const categoryCounts: Record<string, number> = {};
+        if (!response.ok) {
+          throw new Error(data.error || "AI chart planning failed");
+        }
 
-    if (firstCategory) {
-      rows.forEach((row) => {
-        const key = String(row[firstCategory] || "Unknown");
-        categoryCounts[key] = (categoryCounts[key] || 0) + 1;
-      });
+        setPlan(data);
+      } catch (err) {
+        console.error(err);
+        setError("AI chart planning failed. Showing fallback charts.");
+        setPlan(fallbackPlan(rows, headers));
+      } finally {
+        setLoading(false);
+      }
     }
 
-    const pieData = Object.entries(categoryCounts)
-      .slice(0, 6)
-      .map(([name, value]) => ({
-        name,
-        value,
-      }));
-
-    let missingValues = 0;
-    let filledValues = 0;
-
-    rows.forEach((row) => {
-      headers.forEach((header) => {
-        if (
-          row[header] === "" ||
-          row[header] === null ||
-          row[header] === undefined
-        ) {
-          missingValues++;
-        } else {
-          filledValues++;
-        }
-      });
-    });
-
-    const qualityData = [
-      {
-        name: "Filled Values",
-        value: filledValues,
-        color: COLORS.success,
-      },
-      {
-        name: "Missing Values",
-        value: missingValues,
-        color: COLORS.danger,
-      },
-    ];
-
-    const total = numericChartData.reduce(
-      (sum, item) => sum + item.value,
-      0
-    );
-
-    const average =
-      numericChartData.length > 0
-        ? total / numericChartData.length
-        : 0;
-
-    const highest = numericChartData.reduce(
-      (max, item) => (item.value > max.value ? item : max),
-      numericChartData[0]
-    );
-
-    const lowest = numericChartData.reduce(
-      (min, item) => (item.value < min.value ? item : min),
-      numericChartData[0]
-    );
-
-    return {
-      numericColumns,
-      textColumns,
-      firstNumeric,
-      firstCategory,
-      numericChartData,
-      pieData,
-      qualityData,
-      total,
-      average,
-      highest,
-      lowest,
-      missingValues,
-      filledValues,
-    };
+    generatePlan();
   }, [rows, headers]);
 
-  if (!analysis) return null;
+  const chartData = useMemo(() => {
+    if (!plan) return {};
 
-  if (!analysis.firstNumeric) {
-    return (
-      <section className="mt-16 rounded-3xl border border-white/10 bg-white/5 p-10">
-        <h2 className="text-3xl font-bold mb-4">
-          Data Visualization
-        </h2>
+    const data: Record<number, any[]> = {};
 
-        <p className="text-slate-400 leading-7">
-          No numeric columns were detected. Charts require at least one numeric
-          column such as sales, amount, salary, quantity, revenue, score, or
-          price.
-        </p>
-      </section>
-    );
-  }
+    plan.charts.forEach((chart, index) => {
+      if (chart.type === "bar" && chart.categoryColumn && chart.numericColumn) {
+        data[index] = buildBarData(rows, chart.categoryColumn, chart.numericColumn);
+      }
+
+      if (chart.type === "pie" && chart.categoryColumn) {
+        data[index] = buildPieData(rows, chart.categoryColumn);
+      }
+
+      if (chart.type === "line" && chart.dateColumn && chart.numericColumn) {
+        data[index] = buildLineData(rows, chart.dateColumn, chart.numericColumn);
+      }
+    });
+
+    return data;
+  }, [plan, rows]);
+
+  if (!rows.length || !headers.length) return null;
 
   return (
     <section className="mt-20 space-y-10">
       <div>
         <h2 className="text-4xl font-bold mb-4">
-          Smart Charts & Data Visualizations
+          AI-Powered Chart Analysis
         </h2>
 
         <p className="text-slate-400 text-lg leading-8">
-          Charts are automatically generated from your dataset using detected
-          numeric and category columns. Colors are used consistently: green for
-          healthy/filled data, red for missing data, cyan for primary values,
-          and orange for attention areas.
+          CompareCSV uses AI to understand the uploaded dataset, detect its
+          subject and scope, recommend relevant charts, and explain what each
+          visualization means.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-4 gap-6">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-          <p className="text-slate-400 text-sm mb-2">Numeric Column</p>
-          <p className="text-2xl font-bold text-cyan-400">
-            {analysis.firstNumeric}
-          </p>
+      {loading && (
+        <div className="rounded-3xl border border-cyan-400/20 bg-cyan-500/10 p-8 text-cyan-300">
+          AI is analyzing your dataset and preparing relevant charts...
         </div>
+      )}
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-          <p className="text-slate-400 text-sm mb-2">Average</p>
-          <p className="text-2xl font-bold text-green-400">
-            {analysis.average.toLocaleString(undefined, {
-              maximumFractionDigits: 2,
-            })}
-          </p>
+      {error && (
+        <div className="rounded-3xl border border-yellow-400/20 bg-yellow-500/10 p-6 text-yellow-300">
+          {error}
         </div>
+      )}
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-          <p className="text-slate-400 text-sm mb-2">Highest Value</p>
-          <p className="text-2xl font-bold text-cyan-400">
-            {analysis.highest?.value?.toLocaleString()}
-          </p>
-        </div>
+      {plan && (
+        <>
+          <div className="rounded-[32px] border border-cyan-400/20 bg-cyan-500/10 p-10">
+            <div className="inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-300 mb-6">
+              {plan.datasetType}
+            </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-          <p className="text-slate-400 text-sm mb-2">Missing Values</p>
-          <p className="text-2xl font-bold text-red-400">
-            {analysis.missingValues}
-          </p>
-        </div>
-      </div>
+            <h3 className="text-4xl font-bold mb-6">
+              {plan.datasetTitle}
+            </h3>
 
-      <div className="grid lg:grid-cols-2 gap-8">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-          <h3 className="text-2xl font-semibold mb-3">
-            Value Comparison Chart
-          </h3>
-
-          <p className="text-slate-400 mb-8 leading-7">
-            This chart compares the first detected numeric field across rows.
-            Cyan bars show primary values. Taller bars represent higher values.
-          </p>
-
-          <div className="h-[340px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={analysis.numericChartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                <XAxis dataKey="name" stroke="#94a3b8" />
-                <YAxis stroke="#94a3b8" />
-                <Tooltip />
-                <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                  {analysis.numericChartData.map((item, index) => (
-                    <Cell
-                      key={index}
-                      fill={
-                        item.value >= analysis.average
-                          ? COLORS.primary
-                          : COLORS.warning
-                      }
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <p className="text-slate-300 text-lg leading-8">
+              {plan.summary}
+            </p>
           </div>
 
-          <p className="mt-6 text-sm text-slate-400">
-            Cyan = above or equal to average. Orange = below average.
-          </p>
-        </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+              <p className="text-slate-400 text-sm mb-2">Category Column</p>
+              <p className="text-xl font-bold text-cyan-400">
+                {plan.categoryColumn || "Not detected"}
+              </p>
+            </div>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-          <h3 className="text-2xl font-semibold mb-3">
-            Category Distribution
-          </h3>
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+              <p className="text-slate-400 text-sm mb-2">Numeric Column</p>
+              <p className="text-xl font-bold text-green-400">
+                {plan.numericColumn || "Not detected"}
+              </p>
+            </div>
 
-          <p className="text-slate-400 mb-8 leading-7">
-            This chart shows how records are distributed across the detected
-            category column:{" "}
-            <span className="text-cyan-300">
-              {analysis.firstCategory}
-            </span>
-            .
-          </p>
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+              <p className="text-slate-400 text-sm mb-2">Date Column</p>
+              <p className="text-xl font-bold text-yellow-400">
+                {plan.dateColumn || "Not detected"}
+              </p>
+            </div>
 
-          <div className="h-[340px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={analysis.pieData}
-                  dataKey="value"
-                  nameKey="name"
-                  outerRadius={115}
-                  label
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+              <p className="text-slate-400 text-sm mb-2">Rows Analyzed</p>
+              <p className="text-xl font-bold text-purple-400">
+                {rows.length}
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-8">
+            {plan.charts.map((chart, index) => {
+              const data = chartData[index] || [];
+
+              if (!data.length) return null;
+
+              return (
+                <div
+                  key={`${chart.type}-${index}`}
+                  className="rounded-3xl border border-white/10 bg-white/5 p-8"
                 >
-                  {analysis.pieData.map((_, index) => (
-                    <Cell
-                      key={index}
-                      fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
-                    />
-                  ))}
-                </Pie>
+                  <h3 className="text-2xl font-semibold mb-3">
+                    {chart.title}
+                  </h3>
 
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+                  <p className="text-slate-400 leading-7 mb-8">
+                    {chart.description}
+                  </p>
+
+                  <div className="h-[380px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      {chart.type === "bar" ? (
+                        <BarChart data={data}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                          <XAxis dataKey="name" stroke="#94a3b8" />
+                          <YAxis stroke="#94a3b8" />
+                          <Tooltip />
+                          <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                            {data.map((_, i) => (
+                              <Cell
+                                key={i}
+                                fill={COLORS[i % COLORS.length]}
+                              />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      ) : chart.type === "pie" ? (
+                        <PieChart>
+                          <Pie
+                            data={data}
+                            dataKey="value"
+                            nameKey="name"
+                            outerRadius={120}
+                            label
+                          >
+                            {data.map((_, i) => (
+                              <Cell
+                                key={i}
+                                fill={COLORS[i % COLORS.length]}
+                              />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                          <Legend />
+                        </PieChart>
+                      ) : (
+                        <LineChart data={data}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                          <XAxis dataKey="name" stroke="#94a3b8" />
+                          <YAxis stroke="#94a3b8" />
+                          <Tooltip />
+                          <Line
+                            type="monotone"
+                            dataKey="value"
+                            stroke="#06b6d4"
+                            strokeWidth={4}
+                            dot={{ r: 5, fill: "#06b6d4" }}
+                          />
+                        </LineChart>
+                      )}
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          <p className="mt-6 text-sm text-slate-400">
-            Each color represents a different category group.
-          </p>
-        </div>
-      </div>
+          <div className="rounded-[32px] border border-cyan-400/20 bg-cyan-500/10 p-10">
+            <h3 className="text-3xl font-bold mb-8">
+              AI Chart Insights
+            </h3>
 
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-        <h3 className="text-2xl font-semibold mb-3">
-          Trend Line Analysis
-        </h3>
-
-        <p className="text-slate-400 mb-8 leading-7">
-          This line chart shows movement across the first rows of your dataset.
-          It helps identify rising, falling, or inconsistent patterns in the
-          selected numeric field.
-        </p>
-
-        <div className="h-[360px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={analysis.numericChartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-              <XAxis dataKey="name" stroke="#94a3b8" />
-              <YAxis stroke="#94a3b8" />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke={COLORS.primary}
-                strokeWidth={4}
-                dot={{
-                  r: 5,
-                  fill: COLORS.primary,
-                }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
-        <h3 className="text-2xl font-semibold mb-3">
-          Data Quality Chart
-        </h3>
-
-        <p className="text-slate-400 mb-8 leading-7">
-          This chart explains how complete your uploaded dataset is. Green
-          values are filled cells. Red values are missing or blank cells.
-        </p>
-
-        <div className="h-[320px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={analysis.qualityData}
-                dataKey="value"
-                nameKey="name"
-                outerRadius={115}
-                label
-              >
-                {analysis.qualityData.map((item) => (
-                  <Cell key={item.name} fill={item.color} />
-                ))}
-              </Pie>
-
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="mt-6 grid md:grid-cols-2 gap-4">
-          <div className="rounded-2xl bg-green-500/10 border border-green-400/20 p-5">
-            <p className="text-green-400 font-semibold">
-              Green = Filled Values
-            </p>
-            <p className="text-slate-400 text-sm mt-2">
-              These cells contain usable data for analysis.
-            </p>
+            <div className="space-y-5">
+              {plan.insights.map((insight, index) => (
+                <div
+                  key={index}
+                  className="rounded-2xl border border-white/10 bg-black/20 p-5 text-slate-300 leading-7"
+                >
+                  {insight}
+                </div>
+              ))}
+            </div>
           </div>
-
-          <div className="rounded-2xl bg-red-500/10 border border-red-400/20 p-5">
-            <p className="text-red-400 font-semibold">
-              Red = Missing Values
-            </p>
-            <p className="text-slate-400 text-sm mt-2">
-              These cells are blank, missing, or unavailable.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="rounded-3xl border border-cyan-400/20 bg-cyan-500/10 p-8">
-        <h3 className="text-2xl font-semibold mb-4">
-          Chart Interpretation
-        </h3>
-
-        <div className="space-y-4 text-slate-300 leading-8">
-          <p>
-            The main numeric field detected is{" "}
-            <span className="text-cyan-300 font-semibold">
-              {analysis.firstNumeric}
-            </span>
-            . The average visible value is{" "}
-            <span className="text-green-400 font-semibold">
-              {analysis.average.toLocaleString(undefined, {
-                maximumFractionDigits: 2,
-              })}
-            </span>
-            .
-          </p>
-
-          <p>
-            The highest visible value appears in{" "}
-            <span className="text-cyan-300 font-semibold">
-              {analysis.highest?.name}
-            </span>{" "}
-            with a value of{" "}
-            <span className="text-cyan-300 font-semibold">
-              {analysis.highest?.value?.toLocaleString()}
-            </span>
-            .
-          </p>
-
-          <p>
-            The dataset contains{" "}
-            <span className="text-red-400 font-semibold">
-              {analysis.missingValues}
-            </span>{" "}
-            missing values and{" "}
-            <span className="text-green-400 font-semibold">
-              {analysis.filledValues}
-            </span>{" "}
-            filled values.
-          </p>
-        </div>
-      </div>
+        </>
+      )}
     </section>
   );
 }
