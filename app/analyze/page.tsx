@@ -395,6 +395,8 @@ export default function AnalyzePage() {
               </div>
             </section>
 
+            {/* DATASET TABLE */}
+{/*
             <section className="mt-16 rounded-3xl border border-white/10 bg-white/5 p-10 overflow-x-auto">
               <h2 className="text-3xl font-bold mb-8">
                 Resultant Dataset Preview
@@ -424,7 +426,7 @@ export default function AnalyzePage() {
                 </tbody>
               </table>
             </section>
-
+*/}
             <ChartsPanel rows={rows} headers={headers} />
 
             <AIContentGenerator rows={rows} headers={headers} />
