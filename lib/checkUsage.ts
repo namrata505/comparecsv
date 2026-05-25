@@ -1,5 +1,9 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
+
+
+//check usage for free users - limit is 5
+/*
 export async function checkAIUsage(clerkUserId: string) {
   const today = new Date().toISOString().split("T")[0];
 
@@ -68,4 +72,11 @@ export async function checkAIUsage(clerkUserId: string) {
     plan: "free",
     remaining: FREE_LIMIT - data.ai_requests_today,
   };
+}
+
+*/
+
+//unlimited usage for free users
+export async function incrementAIUsage(clerkUserId: string) {
+  return;
 }
