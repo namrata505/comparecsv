@@ -432,7 +432,7 @@ export default function ChartsPanel({ rows, headers }: Props) {
                 <YAxis
                   stroke="#94a3b8"
                   domain={[0, yAxisMax]}
-                  allowDataOverflow={false}
+                  
                 />
                 <Tooltip />
                 <Legend />

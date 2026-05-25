@@ -1,0 +1,80 @@
+[33m0859f75[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Fix AI chart builder fallback display
+[33m6a9ff36[m Fix AI chart builder fallback display
+[33mdf61431[m Allow manual merge column selection
+[33mc94d04f[m Improve analyze upload UX and hide zero issue cards
+[33m7a1aa0b[m Fix chart numeric parsing and y-axis scaling
+[33mbb6f67b[m Fix chart y-axis scaling
+[33m5e56f94[m Add AI key column detection and compressed chart builder
+[33m3fba9fc[m Fix AI chart planning and remove dataset preview
+[33mda979b6[m Enable AI-driven chart analysis
+[33m5e846d6[m Improve analyze charts and descriptions
+[33me9f3e99[m Temporarily disable Lemon Squeezy checkout
+[33m97ab258[m Temporarily allow unlimited AI access
+[33med5519e[m Temporarily enable full free access
+[33me7050bf[m Rename middleware to proxy
+[33mbf074f2[m Remove SIGNUP button
+[33mca25399[m Switch Clerk to production
+[33m7968b7b[m Switch Clerk to production
+[33m2dfa7a4[m Switch Clerk to production
+[33m0a51d68[m Fix user sync GET and POST route
+[33mfe449ee[m Add UserSync component
+[33m2b584d3[m Fix AI usage auto user creation
+[33mb7d59cc[m Fix PDF export helper
+[33m02e47d3[m Sync Clerk users to Supabase
+[33m0fb4b60[m Add PDF export for AI reports
+[33m9452efd[m Fix Lemon Squeezy checkout route and Add AI usage limits to analyze API
+[33m1a55218[m Add Supabase subscription tracking and Lemon webhooks
+[33ma4ef793[m Debug Lemon Squeezy checkout
+[33m7796c90[m Add Lemon Squeezy pricing and checkout
+[33mbf50468[m Restore global header and footer
+[33m80b3222[m Fix Clerk middleware configuration
+[33m5eca77e[m added clerk
+[33m4344a0e[m updated Footer
+[33madffa8f[m Add SUMIFS and COUNTIFS formula pages
+[33mb2f431f[m updated Homepage Link
+[33mc8f5632[m Update VLOOKUP and XLOOKUP tools for two-file lookup
+[33m7eb87e6[m Add functional formula tools
+[33m74c0495[m Updated Tagline in Header
+[33m749dcf6[m Updated Tagline
+[33m3bafce6[m Add global navigation and footer
+[33m1cb27a6[m Add global navigation and footer
+[33m563a803[m Create production terms page
+[33m913e22f[m Create production privacy policy page
+[33m90daef7[m Enable branded support email
+[33m64c535b[m Fix contact page syntax
+[33m1ddda24[m Add contact form email sending
+[33m3441af7[m Improve Contact page content
+[33mdc69f8b[m Improve About page content
+[33m255e067[m Add multi-file merge analysis
+[33m656a115[m Fix analyze AI workflow
+[33m61d42fc[m Fix Ask AI homepage section
+[33m6fdf6e6[m Fix AI textarea section
+[33m0e7a23f[m Add Groq AI spreadsheet analysis system
+[33m7779c48[m Add AI charts and insights dashboard
+[33m7f9eb76[m New premium AI homepage
+[33mccf79d2[m Fix server component event handler error
+[33m01aabfb[m Fix formula dynamic routes
+[33md0ca8f6[m Fix dynamic formula routing
+[33m19bd908[m Fix formula dynamic page
+[33m5e70cb0[m Fix formulas import path
+[33md5c1ed7[m Build dynamic formula library
+[33m814dc20[m Fix countifs page module
+[33m5086210[m Recreate countifs page
+[33m60c3389[m Fix formula pages
+[33m459ec1e[m Fix compare-csv-files-online page
+[33m1578275[m Add Formula Library system
+[33m155a84f[m Add Google AdSense integration
+[33m311468a[m SEO + trust section + UI improvements
+[33mc0d6d6f[m SEO + trust section + UI improvements
+[33m96e87af[m force latest UI update
+[33m0e8dbda[m force redeploy
+[33m7e1bebc[m SEO optimization for homepage ranking
+[33mab94519[m deploy test
+[33m862e325[m Force Vercel redeploy
+[33mf9e94f3[m Add SEO homepage content and FAQ
+[33m46d114f[m Add Google Search Console verification
+[33m0fd02f1[m Add SEO metadata and sitemap
+[33m58d7fd5[m Add legal and informational pages
+[33m2e038d1[m Fix file-saver types
+[33mae1c371[m Fix papaparse types
+[33m0a90f42[m Initial CompareCSV MVP
