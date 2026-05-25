@@ -101,6 +101,31 @@ function compressRows(
   return chunks;
 }
 
+function getMaxChartValue(data: any[], yColumns: string[]) {
+  let max = 0;
+
+  data.forEach((row) => {
+    yColumns.forEach((column) => {
+      const value = Number(row[column]);
+
+      if (!isNaN(value) && value > max) {
+        max = value;
+      }
+    });
+  });
+
+  return max;
+}
+
+function getRoundedMax(value: number) {
+  if (value <= 0) return 10;
+
+  const magnitude = Math.pow(10, Math.floor(Math.log10(value)));
+  const rounded = Math.ceil(value / magnitude) * magnitude;
+
+  return rounded;
+}
+
 export default function ChartsPanel({ rows, headers }: Props) {
   const [plan, setPlan] = useState<ChartPlan | null>(null);
   const [loading, setLoading] = useState(false);
@@ -170,6 +195,13 @@ export default function ChartsPanel({ rows, headers }: Props) {
       sections
     );
   }, [rows, xColumn, selectedYColumns, sections]);
+
+  const yAxisMax = useMemo(() => {
+  const maxValue = getMaxChartValue(chartData, selectedYColumns);
+
+    return getRoundedMax(maxValue);
+  }, [chartData, selectedYColumns]);
+
 
   function toggleYColumn(column: string) {
     setSelectedYColumns((prev) =>
@@ -348,10 +380,14 @@ export default function ChartsPanel({ rows, headers }: Props) {
         <div className="h-[460px]">
           <ResponsiveContainer width="100%" height="100%">
             {chartType === "line" ? (
+
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                 <XAxis dataKey="name" stroke="#94a3b8" />
-                <YAxis stroke="#94a3b8" />
+                <YAxis
+                  stroke="#94a3b8"
+                  domain={[0, yAxisMax]}
+                />
                 <Tooltip />
                 <Legend />
 
@@ -367,10 +403,14 @@ export default function ChartsPanel({ rows, headers }: Props) {
                 ))}
               </LineChart>
             ) : (
+              
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                 <XAxis dataKey="name" stroke="#94a3b8" />
-                <YAxis stroke="#94a3b8" />
+                <YAxis
+                  stroke="#94a3b8"
+                  domain={[0, yAxisMax]}
+                />
                 <Tooltip />
                 <Legend />
 
