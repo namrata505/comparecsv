@@ -48,11 +48,21 @@ const COLORS = [
   "#14b8a6",
 ];
 
+function parseNumber(value: any) {
+  if (value === null || value === undefined || value === "") return null;
+
+  const cleaned = String(value)
+    .replace(/,/g, "")
+    .replace(/[₹$€£,%]/g, "")
+    .trim();
+
+  const number = Number(cleaned);
+
+  return isNaN(number) ? null : number;
+}
+
 function isNumericColumn(rows: any[], column: string) {
-  return rows.some((row) => {
-    const value = row[column];
-    return value !== "" && value !== null && !isNaN(Number(value));
-  });
+  return rows.some((row) => parseNumber(row[column]) !== null);
 }
 
 function compressRows(
@@ -84,8 +94,8 @@ function compressRows(
 
     yColumns.forEach((col) => {
       const values = chunk
-        .map((row) => Number(row[col]))
-        .filter((value) => !isNaN(value));
+        .map((row) => parseNumber(row[col]))
+        .filter((value): value is number => value !== null);
 
       const avg =
         values.length > 0
@@ -106,9 +116,9 @@ function getMaxChartValue(data: any[], yColumns: string[]) {
 
   data.forEach((row) => {
     yColumns.forEach((column) => {
-      const value = Number(row[column]);
+      const value = parseNumber(row[column]);
 
-      if (!isNaN(value) && value > max) {
+      if (value !== null && value > max) {
         max = value;
       }
     });
@@ -120,8 +130,19 @@ function getMaxChartValue(data: any[], yColumns: string[]) {
 function getRoundedMax(value: number) {
   if (value <= 0) return 10;
 
-  const magnitude = Math.pow(10, Math.floor(Math.log10(value)));
-  const rounded = Math.ceil(value / magnitude) * magnitude;
+  const paddedValue = value * 1.15;
+  const magnitude = Math.pow(10, Math.floor(Math.log10(paddedValue)));
+  const normalized = paddedValue / magnitude;
+
+  let rounded;
+
+  if (normalized <= 2) {
+    rounded = 2 * magnitude;
+  } else if (normalized <= 5) {
+    rounded = 5 * magnitude;
+  } else {
+    rounded = 10 * magnitude;
+  }
 
   return rounded;
 }
@@ -387,6 +408,7 @@ export default function ChartsPanel({ rows, headers }: Props) {
                 <YAxis
                   stroke="#94a3b8"
                   domain={[0, yAxisMax]}
+                  allowDataOverflow={false}
                 />
                 <Tooltip />
                 <Legend />
@@ -403,13 +425,14 @@ export default function ChartsPanel({ rows, headers }: Props) {
                 ))}
               </LineChart>
             ) : (
-              
+
               <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                 <XAxis dataKey="name" stroke="#94a3b8" />
                 <YAxis
                   stroke="#94a3b8"
                   domain={[0, yAxisMax]}
+                  allowDataOverflow={false}
                 />
                 <Tooltip />
                 <Legend />

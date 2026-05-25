@@ -395,38 +395,7 @@ export default function AnalyzePage() {
               </div>
             </section>
 
-            {/* DATASET TABLE */}
-{/*
-            <section className="mt-16 rounded-3xl border border-white/10 bg-white/5 p-10 overflow-x-auto">
-              <h2 className="text-3xl font-bold mb-8">
-                Resultant Dataset Preview
-              </h2>
 
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-white/10">
-                    {headers.map((header) => (
-                      <th key={header} className="p-4 text-cyan-300">
-                        {header}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {rows.slice(0, 10).map((row, index) => (
-                    <tr key={index} className="border-b border-white/5">
-                      {headers.map((header) => (
-                        <td key={header} className="p-4 text-slate-300">
-                          {String(row[header] ?? "")}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </section>
-*/}
             <ChartsPanel rows={rows} headers={headers} />
 
             <AIContentGenerator rows={rows} headers={headers} />
