@@ -105,6 +105,8 @@ export default function PricingPage() {
               <li>• Priority features</li>
             </ul>
 
+
+          {/* temorary disabling the Payment button for Pro Subsriptions, and Disbling Lemon squeezy 
             <button
               onClick={handleCheckout}
               disabled={loading}
@@ -112,6 +114,19 @@ export default function PricingPage() {
             >
               {loading ? "Opening Checkout..." : "Upgrade to Pro"}
             </button>
+          */}
+
+          {/* Allowing full access */}
+            <button
+              disabled
+              className="inline-flex w-full justify-center rounded-2xl bg-slate-700 px-6 py-4 font-semibold text-slate-300 cursor-not-allowed"
+            >
+              Pro Coming Soon
+            </button>
+
+            <p className="mt-4 text-sm text-slate-400 text-center">
+              Full free access is currently enabled while payments are being activated.
+            </p>
           </div>
         </div>
       </section>
