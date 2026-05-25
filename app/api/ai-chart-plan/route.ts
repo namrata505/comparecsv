@@ -68,6 +68,16 @@ Return this exact JSON structure:
     "insight 2",
     "insight 3"
   ]
+
+  "keyColumns": [
+    {
+        "name": "column name",
+        "role": "date | category | numeric | identifier | status",
+        "reason": "why this column is important"
+    }
+    ],
+    
+    "suggestedYAxisColumns": ["column1", "column2"]
 }
 
 Rules:

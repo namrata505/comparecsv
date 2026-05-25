@@ -3,17 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ResponsiveContainer,
+  LineChart,
+  Line,
   BarChart,
   Bar,
   XAxis,
   YAxis,
   Tooltip,
   CartesianGrid,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
   Legend,
 } from "recharts";
 
@@ -22,13 +19,10 @@ type Props = {
   headers: string[];
 };
 
-type ChartItem = {
-  type: "bar" | "pie" | "line";
-  title: string;
-  categoryColumn?: string;
-  numericColumn?: string;
-  dateColumn?: string;
-  description: string;
+type KeyColumn = {
+  name: string;
+  role: string;
+  reason: string;
 };
 
 type ChartPlan = {
@@ -39,7 +33,8 @@ type ChartPlan = {
   numericColumn: string;
   dateColumn: string;
   statusColumn: string;
-  charts: ChartItem[];
+  keyColumns?: KeyColumn[];
+  suggestedYAxisColumns?: string[];
   insights: string[];
 };
 
@@ -51,127 +46,92 @@ const COLORS = [
   "#3b82f6",
   "#ef4444",
   "#14b8a6",
-  "#eab308",
 ];
 
-function isNumber(value: any) {
-  return value !== "" && value !== null && value !== undefined && !isNaN(Number(value));
-}
-
-function buildBarData(rows: any[], categoryColumn: string, numericColumn: string) {
-  const grouped: Record<string, number> = {};
-
-  rows.forEach((row) => {
-    const key = String(row[categoryColumn] || "Unknown");
-    const value = Number(row[numericColumn] || 0);
-
-    grouped[key] = (grouped[key] || 0) + value;
+function isNumericColumn(rows: any[], column: string) {
+  return rows.some((row) => {
+    const value = row[column];
+    return value !== "" && value !== null && !isNaN(Number(value));
   });
-
-  return Object.entries(grouped)
-    .map(([name, value]) => ({ name: name.slice(0, 28), value }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 12);
 }
 
-function buildPieData(rows: any[], categoryColumn: string) {
-  const grouped: Record<string, number> = {};
+function compressRows(
+  rows: any[],
+  xColumn: string,
+  yColumns: string[],
+  sections: number
+) {
+  if (!rows.length || !xColumn || !yColumns.length) return [];
 
-  rows.forEach((row) => {
-    const key = String(row[categoryColumn] || "Unknown");
-    grouped[key] = (grouped[key] || 0) + 1;
-  });
+  const chunkSize = Math.ceil(rows.length / sections);
 
-  return Object.entries(grouped)
-    .map(([name, value]) => ({ name: name.slice(0, 28), value }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 8);
-}
+  const chunks = [];
 
-function buildLineData(rows: any[], dateColumn: string, numericColumn: string) {
-  const grouped: Record<string, number> = {};
+  for (let i = 0; i < rows.length; i += chunkSize) {
+    const chunk = rows.slice(i, i + chunkSize);
 
-  rows.forEach((row) => {
-    const rawDate = row[dateColumn];
+    const startLabel = String(chunk[0]?.[xColumn] ?? `Row ${i + 1}`);
+    const endLabel = String(
+      chunk[chunk.length - 1]?.[xColumn] ?? `Row ${i + chunk.length}`
+    );
 
-    if (!rawDate) return;
+    const item: any = {
+      name:
+        startLabel === endLabel
+          ? startLabel
+          : `${startLabel} → ${endLabel}`,
+    };
 
-    const key = String(rawDate).slice(0, 10);
-    const value = Number(row[numericColumn] || 0);
+    yColumns.forEach((col) => {
+      const values = chunk
+        .map((row) => Number(row[col]))
+        .filter((value) => !isNaN(value));
 
-    grouped[key] = (grouped[key] || 0) + value;
-  });
+      const avg =
+        values.length > 0
+          ? values.reduce((sum, value) => sum + value, 0) / values.length
+          : 0;
 
-  return Object.entries(grouped)
-    .map(([name, value]) => ({ name, value }))
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .slice(0, 30);
-}
+      item[col] = Number(avg.toFixed(2));
+    });
 
-function fallbackPlan(rows: any[], headers: string[]): ChartPlan {
-  const numericColumn =
-    headers.find((header) => rows.some((row) => isNumber(row[header]))) || "";
+    chunks.push(item);
+  }
 
-  const categoryColumn =
-    headers.find((header) => header !== numericColumn) || headers[0] || "";
-
-  return {
-    datasetTitle: "Spreadsheet Dataset Analysis",
-    datasetType: "general",
-    summary:
-      "This dataset has been analyzed using available columns. CompareCSV generated practical charts based on detected category and numeric fields.",
-    categoryColumn,
-    numericColumn,
-    dateColumn: "",
-    statusColumn: "",
-    charts: [
-      numericColumn && categoryColumn
-        ? {
-            type: "bar",
-            title: `${numericColumn} by ${categoryColumn}`,
-            categoryColumn,
-            numericColumn,
-            description:
-              "This chart compares numeric values across categories to highlight the largest and smallest groups.",
-          }
-        : {
-            type: "pie",
-            title: `Distribution by ${categoryColumn}`,
-            categoryColumn,
-            description:
-              "This chart shows how records are distributed across the selected category.",
-          },
-      {
-        type: "pie",
-        title: `Record Distribution by ${categoryColumn}`,
-        categoryColumn,
-        description:
-          "This distribution helps understand which groups appear most often in the uploaded dataset.",
-      },
-    ].filter(Boolean) as ChartItem[],
-    insights: [
-      `The dataset contains ${rows.length} rows and ${headers.length} columns.`,
-      numericColumn
-        ? `The detected numeric column is ${numericColumn}.`
-        : "No strong numeric column was detected.",
-      categoryColumn
-        ? `The detected category column is ${categoryColumn}.`
-        : "No strong category column was detected.",
-    ],
-  };
+  return chunks;
 }
 
 export default function ChartsPanel({ rows, headers }: Props) {
   const [plan, setPlan] = useState<ChartPlan | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+
+  const numericColumns = useMemo(
+    () => headers.filter((header) => isNumericColumn(rows, header)),
+    [rows, headers]
+  );
+
+  const defaultXColumn =
+    plan?.dateColumn ||
+    plan?.categoryColumn ||
+    headers[0] ||
+    "";
+
+  const defaultYColumns =
+    plan?.suggestedYAxisColumns?.filter((col) =>
+      numericColumns.includes(col)
+    ) ||
+    numericColumns.slice(0, 2);
+
+  const [xColumn, setXColumn] = useState("");
+  const [selectedYColumns, setSelectedYColumns] = useState<string[]>([]);
+  const [sections, setSections] = useState(12);
+  const [chartType, setChartType] = useState<"line" | "bar">("line");
 
   useEffect(() => {
     async function generatePlan() {
       if (!rows.length || !headers.length) return;
 
       setLoading(true);
-      setError("");
 
       try {
         const response = await fetch("/api/ai-chart-plan", {
@@ -179,23 +139,14 @@ export default function ChartsPanel({ rows, headers }: Props) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            rows,
-            headers,
-          }),
+          body: JSON.stringify({ rows, headers }),
         });
 
         const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(data.error || "AI chart planning failed");
-        }
-
         setPlan(data);
-      } catch (err) {
-        console.error(err);
-        setError("AI chart planning failed. Showing fallback charts.");
-        setPlan(fallbackPlan(rows, headers));
+      } catch (error) {
+        console.error(error);
       } finally {
         setLoading(false);
       }
@@ -204,196 +155,256 @@ export default function ChartsPanel({ rows, headers }: Props) {
     generatePlan();
   }, [rows, headers]);
 
+  useEffect(() => {
+    if (!plan) return;
+
+    setXColumn(defaultXColumn);
+    setSelectedYColumns(defaultYColumns);
+  }, [plan]);
+
   const chartData = useMemo(() => {
-    if (!plan) return {};
+    return compressRows(
+      rows,
+      xColumn,
+      selectedYColumns,
+      sections
+    );
+  }, [rows, xColumn, selectedYColumns, sections]);
 
-    const data: Record<number, any[]> = {};
+  function toggleYColumn(column: string) {
+    setSelectedYColumns((prev) =>
+      prev.includes(column)
+        ? prev.filter((item) => item !== column)
+        : [...prev, column]
+    );
+  }
 
-    plan.charts.forEach((chart, index) => {
-      if (chart.type === "bar" && chart.categoryColumn && chart.numericColumn) {
-        data[index] = buildBarData(rows, chart.categoryColumn, chart.numericColumn);
-      }
-
-      if (chart.type === "pie" && chart.categoryColumn) {
-        data[index] = buildPieData(rows, chart.categoryColumn);
-      }
-
-      if (chart.type === "line" && chart.dateColumn && chart.numericColumn) {
-        data[index] = buildLineData(rows, chart.dateColumn, chart.numericColumn);
-      }
-    });
-
-    return data;
-  }, [plan, rows]);
-
-  if (!rows.length || !headers.length) return null;
+  if (!rows.length) return null;
 
   return (
     <section className="mt-20 space-y-10">
       <div>
         <h2 className="text-4xl font-bold mb-4">
-          AI-Powered Chart Analysis
+          AI Chart Builder
         </h2>
 
         <p className="text-slate-400 text-lg leading-8">
-          CompareCSV uses AI to understand the uploaded dataset, detect its
-          subject and scope, recommend relevant charts, and explain what each
-          visualization means.
+          CompareCSV identifies key columns using AI, then compresses large
+          datasets into equal chart sections so trends remain visible even when
+          the file contains many rows.
         </p>
       </div>
 
       {loading && (
         <div className="rounded-3xl border border-cyan-400/20 bg-cyan-500/10 p-8 text-cyan-300">
-          AI is analyzing your dataset and preparing relevant charts...
-        </div>
-      )}
-
-      {error && (
-        <div className="rounded-3xl border border-yellow-400/20 bg-yellow-500/10 p-6 text-yellow-300">
-          {error}
+          AI is identifying key columns and chart structure...
         </div>
       )}
 
       {plan && (
-        <>
-          <div className="rounded-[32px] border border-cyan-400/20 bg-cyan-500/10 p-10">
-            <div className="inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-300 mb-6">
-              {plan.datasetType}
-            </div>
-
-            <h3 className="text-4xl font-bold mb-6">
-              {plan.datasetTitle}
-            </h3>
-
-            <p className="text-slate-300 text-lg leading-8">
-              {plan.summary}
-            </p>
+        <div className="rounded-[32px] border border-cyan-400/20 bg-cyan-500/10 p-10">
+          <div className="inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-300 mb-6">
+            {plan.datasetType}
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-              <p className="text-slate-400 text-sm mb-2">Category Column</p>
-              <p className="text-xl font-bold text-cyan-400">
-                {plan.categoryColumn || "Not detected"}
+          <h3 className="text-4xl font-bold mb-6">
+            {plan.datasetTitle}
+          </h3>
+
+          <p className="text-slate-300 text-lg leading-8">
+            {plan.summary}
+          </p>
+        </div>
+      )}
+
+      {plan?.keyColumns && (
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {plan.keyColumns.map((col) => (
+            <div
+              key={col.name}
+              className="rounded-3xl border border-white/10 bg-white/5 p-6"
+            >
+              <p className="text-cyan-400 font-semibold mb-2">
+                {col.name}
+              </p>
+
+              <p className="text-sm text-slate-400 uppercase mb-3">
+                {col.role}
+              </p>
+
+              <p className="text-slate-300 text-sm leading-6">
+                {col.reason}
               </p>
             </div>
+          ))}
+        </div>
+      )}
 
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-              <p className="text-slate-400 text-sm mb-2">Numeric Column</p>
-              <p className="text-xl font-bold text-green-400">
-                {plan.numericColumn || "Not detected"}
-              </p>
-            </div>
+      <div className="rounded-[32px] border border-white/10 bg-white/5 p-8">
+        <h3 className="text-3xl font-bold mb-8">
+          Customize Chart
+        </h3>
 
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-              <p className="text-slate-400 text-sm mb-2">Date Column</p>
-              <p className="text-xl font-bold text-yellow-400">
-                {plan.dateColumn || "Not detected"}
-              </p>
-            </div>
+        <div className="grid md:grid-cols-4 gap-6">
+          <div>
+            <label className="block text-sm text-slate-400 mb-2">
+              X-Axis Column
+            </label>
 
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-              <p className="text-slate-400 text-sm mb-2">Rows Analyzed</p>
-              <p className="text-xl font-bold text-purple-400">
-                {rows.length}
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-8">
-            {plan.charts.map((chart, index) => {
-              const data = chartData[index] || [];
-
-              if (!data.length) return null;
-
-              return (
-                <div
-                  key={`${chart.type}-${index}`}
-                  className="rounded-3xl border border-white/10 bg-white/5 p-8"
-                >
-                  <h3 className="text-2xl font-semibold mb-3">
-                    {chart.title}
-                  </h3>
-
-                  <p className="text-slate-400 leading-7 mb-8">
-                    {chart.description}
-                  </p>
-
-                  <div className="h-[380px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      {chart.type === "bar" ? (
-                        <BarChart data={data}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                          <XAxis dataKey="name" stroke="#94a3b8" />
-                          <YAxis stroke="#94a3b8" />
-                          <Tooltip />
-                          <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                            {data.map((_, i) => (
-                              <Cell
-                                key={i}
-                                fill={COLORS[i % COLORS.length]}
-                              />
-                            ))}
-                          </Bar>
-                        </BarChart>
-                      ) : chart.type === "pie" ? (
-                        <PieChart>
-                          <Pie
-                            data={data}
-                            dataKey="value"
-                            nameKey="name"
-                            outerRadius={120}
-                            label
-                          >
-                            {data.map((_, i) => (
-                              <Cell
-                                key={i}
-                                fill={COLORS[i % COLORS.length]}
-                              />
-                            ))}
-                          </Pie>
-                          <Tooltip />
-                          <Legend />
-                        </PieChart>
-                      ) : (
-                        <LineChart data={data}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                          <XAxis dataKey="name" stroke="#94a3b8" />
-                          <YAxis stroke="#94a3b8" />
-                          <Tooltip />
-                          <Line
-                            type="monotone"
-                            dataKey="value"
-                            stroke="#06b6d4"
-                            strokeWidth={4}
-                            dot={{ r: 5, fill: "#06b6d4" }}
-                          />
-                        </LineChart>
-                      )}
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="rounded-[32px] border border-cyan-400/20 bg-cyan-500/10 p-10">
-            <h3 className="text-3xl font-bold mb-8">
-              AI Chart Insights
-            </h3>
-
-            <div className="space-y-5">
-              {plan.insights.map((insight, index) => (
-                <div
-                  key={index}
-                  className="rounded-2xl border border-white/10 bg-black/20 p-5 text-slate-300 leading-7"
-                >
-                  {insight}
-                </div>
+            <select
+              value={xColumn}
+              onChange={(e) => setXColumn(e.target.value)}
+              className="w-full rounded-2xl bg-slate-900 border border-white/10 p-4 text-white"
+            >
+              {headers.map((header) => (
+                <option key={header} value={header}>
+                  {header}
+                </option>
               ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm text-slate-400 mb-2">
+              Compress X-Axis Into Sections
+            </label>
+
+            <select
+              value={sections}
+              onChange={(e) => setSections(Number(e.target.value))}
+              className="w-full rounded-2xl bg-slate-900 border border-white/10 p-4 text-white"
+            >
+              {[6, 8, 10, 12, 16, 20, 30, 50].map((num) => (
+                <option key={num} value={num}>
+                  {num} sections
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm text-slate-400 mb-2">
+              Chart Type
+            </label>
+
+            <select
+              value={chartType}
+              onChange={(e) =>
+                setChartType(e.target.value as "line" | "bar")
+              }
+              className="w-full rounded-2xl bg-slate-900 border border-white/10 p-4 text-white"
+            >
+              <option value="line">Line Chart</option>
+              <option value="bar">Bar Chart</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm text-slate-400 mb-2">
+              Rows Per Section
+            </label>
+
+            <div className="rounded-2xl bg-slate-900 border border-white/10 p-4 text-cyan-300">
+              ~{Math.ceil(rows.length / sections)} rows
             </div>
           </div>
-        </>
+        </div>
+
+        <div className="mt-8">
+          <p className="text-sm text-slate-400 mb-4">
+            Select Y-Axis Columns
+          </p>
+
+          <div className="flex flex-wrap gap-3">
+            {numericColumns.map((column) => (
+              <button
+                key={column}
+                onClick={() => toggleYColumn(column)}
+                className={`rounded-2xl px-5 py-3 text-sm font-medium transition ${
+                  selectedYColumns.includes(column)
+                    ? "bg-cyan-500 text-black"
+                    : "border border-white/10 bg-white/5 text-slate-300"
+                }`}
+              >
+                {column}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-8">
+        <h3 className="text-2xl font-semibold mb-3">
+          Compressed Trend Chart
+        </h3>
+
+        <p className="text-slate-400 leading-7 mb-8">
+          The dataset is divided into {sections} equal X-axis sections.
+          Each point represents the average value of selected Y-axis columns
+          inside that section. This makes large row datasets readable while
+          preserving the overall trend.
+        </p>
+
+        <div className="h-[460px]">
+          <ResponsiveContainer width="100%" height="100%">
+            {chartType === "line" ? (
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                <XAxis dataKey="name" stroke="#94a3b8" />
+                <YAxis stroke="#94a3b8" />
+                <Tooltip />
+                <Legend />
+
+                {selectedYColumns.map((col, index) => (
+                  <Line
+                    key={col}
+                    type="monotone"
+                    dataKey={col}
+                    stroke={COLORS[index % COLORS.length]}
+                    strokeWidth={3}
+                    dot={false}
+                  />
+                ))}
+              </LineChart>
+            ) : (
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                <XAxis dataKey="name" stroke="#94a3b8" />
+                <YAxis stroke="#94a3b8" />
+                <Tooltip />
+                <Legend />
+
+                {selectedYColumns.map((col, index) => (
+                  <Bar
+                    key={col}
+                    dataKey={col}
+                    fill={COLORS[index % COLORS.length]}
+                    radius={[6, 6, 0, 0]}
+                  />
+                ))}
+              </BarChart>
+            )}
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {plan?.insights && (
+        <div className="rounded-[32px] border border-cyan-400/20 bg-cyan-500/10 p-10">
+          <h3 className="text-3xl font-bold mb-8">
+            AI Interpretation
+          </h3>
+
+          <div className="space-y-5">
+            {plan.insights.map((insight, index) => (
+              <div
+                key={index}
+                className="rounded-2xl border border-white/10 bg-black/20 p-5 text-slate-300 leading-7"
+              >
+                {insight}
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </section>
   );
