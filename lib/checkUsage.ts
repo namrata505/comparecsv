@@ -77,6 +77,11 @@ export async function checkAIUsage(clerkUserId: string) {
 */
 
 //unlimited usage for free users
-export async function incrementAIUsage(clerkUserId: string) {
-  return;
+export async function checkAIUsage(clerkUserId: string) {
+  return {
+    allowed: true,
+    plan: "free",
+    remaining: "unlimited",
+    reason: "Temporary full free access enabled",
+  };
 }
